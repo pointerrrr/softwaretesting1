@@ -30,5 +30,16 @@ namespace STVRogue.Utils
             Assert.IsTrue(V.Contains(N3));
             Assert.IsFalse(V.Contains(N4));
         }
+
+        [TestMethod]
+        public void MSTest_EndReachable()
+        {
+            Dungeon dungeon = new Dungeon(4, 9);
+            
+            Predicates utils = new Predicates();
+            bool endFound = utils.isReachable(dungeon.startNode, dungeon.exitNode);
+            Assert.IsTrue(endFound);
+        }
+
     }
 }

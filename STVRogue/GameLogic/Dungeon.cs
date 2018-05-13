@@ -19,12 +19,13 @@ namespace STVRogue.GameLogic
         /* To create a new dungeon with the specified difficult level and capacity multiplier */
         public Dungeon(uint level, uint nodeCapacityMultiplier)
         {
+            RandomGenerator.initializeWithSeed(1337);
             random = RandomGenerator.rnd;
             Logger.log("Creating a dungeon of difficulty level " + level + ", node capacity multiplier " + nodeCapacityMultiplier + ".");
             difficultyLevel = level;
             M = nodeCapacityMultiplier;
 
-            Node start = new Node("start");
+            Node start = new Node("start");            
             Node exit = new Node("exit");
             List<List<Node>> zones = new List<List<Node>>();
             Bridge[] bridges = new Bridge[level];
@@ -35,7 +36,8 @@ namespace STVRogue.GameLogic
                     bridges[i] = new Bridge(i.ToString());
                 zones.Add( generateZone(i, i == 0 ? start : bridges[i-1], i == level ? exit : bridges[i]));
             }
-            int asdf = 1;
+            startNode = start;
+            exitNode = exit;
         }
 
         // based on https://stackoverflow.com/a/39112650
@@ -82,7 +84,7 @@ namespace STVRogue.GameLogic
                 while (!node.connectedWithStart)
                 {
                     int idx = random.Next(0, connected.Count);
-                    if (connected[idx].neighbors.Count < 4)
+                    //if (connected[idx].neighbors.Count < 4)
                         node.connect(connected[idx]);
                 }
             }
