@@ -24,6 +24,7 @@ namespace STVRogue.GameLogic
             Logger.log("Creating a game of difficulty level " + difficultyLevel + ", node capacity multiplier "
                        + nodeCapcityMultiplier + ", and " + numberOfMonsters + " monsters.");
             player = new Player();
+            dungeon = new Dungeon(difficultyLevel, nodeCapcityMultiplier);
         }
 
         /*
