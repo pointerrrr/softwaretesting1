@@ -58,12 +58,15 @@ namespace STVRogue.GameLogic
 
             for (int i = 0; i < result.Count; i++)
             {
-                int rand = random.Next(0, connectedWithStart.Count - 1);
-                if(canConnect(result[rand]) && canConnect(result[i]) && result[i] != result[rand])
+                while (!connectedWithStart.Contains(result[i]))
                 {
-                    result[i].connect(connectedWithStart[rand]);
-                    if (!connectedWithStart.Contains(result[i]))
-                        connectedWithStart.Add(result[i]);
+                    int rand = random.Next(0, connectedWithStart.Count - 1);
+                    if (canConnect(result[rand]) && canConnect(result[i]) && result[i] != result[rand])
+                    {
+                        result[i].connect(connectedWithStart[rand]);
+                        if (!connectedWithStart.Contains(result[i]))
+                            connectedWithStart.Add(result[i]);
+                    }
                 }
             }
 
@@ -199,7 +202,6 @@ namespace STVRogue.GameLogic
         public List<Node> neighbors = new List<Node>();
         public List<Pack> packs = new List<Pack>();
         public List<Item> items = new List<Item>();
-        public bool connectedWithStart = false;
 
         public Node() { }
         public Node(String id) { this.id = id; }
@@ -207,26 +209,7 @@ namespace STVRogue.GameLogic
         /* To connect this node to another node. */
         public void connect(Node nd)
         {
-            if (connectedWithStart)
-                nd.connectedWithStart = true;
-            if (nd.connectedWithStart)
-                connectedWithStart = true;
             neighbors.Add(nd); nd.neighbors.Add(this);
-            checkStart();
-            nd.checkStart();
-        }
-
-        public void checkStart()
-        {
-            if (connectedWithStart)
-                foreach (Node node in neighbors)
-                {
-                    if (!node.connectedWithStart)
-                    {
-                        node.connectedWithStart = true;
-                        node.checkStart();
-                    }
-                }
         }
 
         /* To disconnect this node from the given node. */
