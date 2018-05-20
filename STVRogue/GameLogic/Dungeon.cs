@@ -44,51 +44,46 @@ namespace STVRogue.GameLogic
         public List<Node> generateZone(int zoneId, Node start, Node end)
         {
             List<Node> result = new List<Node>();
+            result.Add(start);
             int size = random.Next(1, 8);
             for (int i = 0; i < size; i++)
             {
                 result.Add( new Node(zoneId + "." + i));
             }
+            result.Add(end);
+            List<Node> connectedWithStart = new List<Node>();
+            connectedWithStart.Add(start);
 
-            int startConnections = Math.Min(random.Next(0, 2), result.Count-1);
-            for (int i = 0; i <= startConnections; i++)
-            {
-                result[i].connectedWithStart = true;
-                result[i].connect(start);
-            }
+            Func<Node, bool> canConnect = (Node node) => { return (node.neighbors.Count < 2 || (node != end && node.neighbors.Count < 4)); };
 
-            int endConnections = Math.Min(random.Next(0, 2), result.Count-1);
-            for (int i = 0; i <= startConnections; i++)
+            for (int i = 0; i < result.Count; i++)
             {
-                result[result.Count- 1 - i].connect(end);
-            }
-
-            foreach (Node node in result)
-            {
-                int numConnections = random.Next(0,3);
-                for (int i = 0; i < numConnections; i++)
+                int rand = random.Next(0, connectedWithStart.Count - 1);
+                if(canConnect(result[rand]) && canConnect(result[i]) && result[i] != result[rand])
                 {
-                    //Find a random node to connect to
-                    int idx = (int)(random.NextDouble() * result.Count);
-                    if (result[idx].neighbors.Count < 4)
-                        node.connect(result[idx]);
+                    result[i].connect(connectedWithStart[rand]);
+                    if (!connectedWithStart.Contains(result[i]))
+                        connectedWithStart.Add(result[i]);
                 }
             }
 
-            foreach(Node node in result)
+            int connections = random.Next(0, result.Count);
+            for(int i = 0; i < connections; i++)
             {
-                List<Node> connected = new List<Node>();
-                foreach (Node temp in result)
-                    if (temp.connectedWithStart)
-                        connected.Add(temp);
-                while (!node.connectedWithStart)
+                bool found = false;
+                while(!found)
                 {
-                    int idx = random.Next(0, connected.Count);
-                    //if (connected[idx].neighbors.Count < 4)
-                        node.connect(connected[idx]);
+                    int rand1 = random.Next(0, result.Count - 1);
+                    int rand2 = random.Next(0, result.Count - 1);
+                    while (rand2 == rand1)
+                        rand2 = random.Next(0, result.Count - 1);
+                    if (canConnect(result[rand1]) && canConnect(result[rand2]))
+                    {
+                        result[rand1].connect(result[rand2]);
+                        found = true;
+                    }
                 }
             }
-
             return result;
         }
 
