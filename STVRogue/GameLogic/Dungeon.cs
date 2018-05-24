@@ -33,153 +33,116 @@ namespace STVRogue.GameLogic
             for(int i = 0; i <= level; i++)
             {
                 if(i < level)
-                    bridges[i] = new Bridge(i.ToString());
+                    bridges[i] = new Bridge((i+1).ToString());
                 zones.Add( generateZone(i, i == 0 ? start : bridges[i-1], i == level ? exit : bridges[i]));
             }
             startNode = start;
             exitNode = exit;
         }
 
-        // based on https://stackoverflow.com/a/39112650
+        // Generate a zone by creating 2 paths to the next bridge and adding random connections in between those paths
         public List<Node> generateZone(int zoneId, Node start, Node end)
         {
-            List<Node> result = new List<Node>();
-            result.Add(start);
-            int size = random.Next(1, 8);
-            for (int i = 0; i < size; i++)
-            {
-                result.Add( new Node(zoneId + "." + i));
-            }
-            result.Add(end);
-            List<Node> connectedWithStart = new List<Node>();
-            connectedWithStart.Add(start);
+            List<Node> zone = new List<Node>();
+            zone.AddRange(createLinearPath(start, end, random.Next(1, 4), zoneId, 1));
+            zone.AddRange(createLinearPath(start, end, random.Next(1, 4), zoneId, 2));
 
-            Func<Node, bool> canConnect = (Node node) => { return (node.neighbors.Count < 2 || (node != end && node.neighbors.Count < 4)); };
-
-            for (int i = 0; i < result.Count; i++)
+            int counter = 0;
+            while (random.NextDouble() < 0.75 && counter < 5)
             {
-                while (!connectedWithStart.Contains(result[i]))
-                {
-                    int rand = random.Next(0, connectedWithStart.Count - 1);
-                    if (canConnect(result[rand]) && canConnect(result[i]) && result[i] != result[rand])
+                Node nodeA = zone[random.Next(zone.Count)];
+                Node nodeB = zone[random.Next(zone.Count)];
+
+                if (nodeA.id != nodeB.id)
+                    if (nodeA.neighbors.Count < 4 && nodeB.neighbors.Count < 4
+                        && !nodeA.neighbors.Contains(nodeB))
                     {
-                        result[i].connect(connectedWithStart[rand]);
-                        if (!connectedWithStart.Contains(result[i]))
-                            connectedWithStart.Add(result[i]);
+                        nodeA.connect(nodeB);
+                        continue;
                     }
-                }
+
+                counter++;
             }
 
-            int connections = random.Next(0, result.Count);
-            for(int i = 0; i < connections; i++)
+            counter = 0;
+            int nodeId = 0;
+            // Disconnect or add new nodes untill connectivity falls below 3.0
+            while(calculateConnectivity(zone) > 3.0)
             {
-                bool found = false;
-                while(!found)
+                zone.Sort((nodeA, nodeB) => nodeA.neighbors.Count.CompareTo(nodeB.neighbors.Count));
+                
+                // If all nodes are full, disconnect with a node from the other path
+                if (zone[0].neighbors.Count == 4)
                 {
-                    int rand1 = random.Next(0, result.Count - 1);
-                    int rand2 = random.Next(0, result.Count - 1);
-                    while (rand2 == rand1)
-                        rand2 = random.Next(0, result.Count - 1);
-                    if (canConnect(result[rand1]) && canConnect(result[rand2]))
+                    Node fullNode = zone[counter];
+                    Node toDisconnect = fullNode.neighbors.Find(node => node.pathId != fullNode.pathId && node.pathId != 0);
+                    if (toDisconnect == null)
                     {
-                        result[rand1].connect(result[rand2]);
-                        found = true;
+                        counter++;
+                        continue;
                     }
+                    fullNode.disconnect(toDisconnect);
+                    counter = 0;
+                    continue;
                 }
+
+                Node newNode = new Node(zoneId, 3, nodeId);
+                newNode.connect(zone[0]);
+                zone.Add(newNode);
+                nodeId++;
             }
-            return result;
+
+            return zone;
         }
 
-        /*
-        public List<Node> generateZonae(int zoneId)
+        // Create direct path of given length between start and end bridge
+        public List<Node> createLinearPath(Node start, Node end, int pathLength, int zoneId, int pathId)
         {
-            List<Node> result = new List<Node>();
-            int size = random.Next(1,8);
-            for(int i = 0; i < size; i++)
+            List<Node> path = new List<Node>();
+
+            for (int i = 0; i < pathLength; i++)
             {
-                result[i] = new Node(zoneId + "." + i);
-            }
-            
-            List<Node[]> nodeList = new List<Node[]>();
-            int nodeTotal = 0;
-            int columnCount = 0;
-            while(nodeTotal < size)
-            {
-                nodeList[columnCount] = new Node[3];
+                Node node = new Node(zoneId, pathId, i);
+                path.Add(node);
 
-                int rando = random.Next(0, 7);
-
-                for(int i = 0; i < 3; i++)
-                    nodeList[columnCount][i] = permutations[rando, i] ? new Node() : null;
-                nodeTotal += rando / 3 + 1;
-                columnCount++;
-            }
-            for (int i = 0; i < 3; i++)
-                if(nodeList[0][i] != null)
-                    nodeList[0][i].connectedWithStart = true;
-
-
-            for(int i = 0; i < columnCount - 1; i++)
-                for (int k = 0; k < 3; k++)
-                    for (int j = 0; j < 2; j++)
-                    {
-                        if (k > 0)
-                            if (random.Next(0, 3) == 2 && nodeList[i + j][k - 1] != null)
-                                nodeList[i + j][k - 1].connect(nodeList[i][k]);
-                        if (j != 0)
-                            if(random.Next(0,3) == 2 && nodeList[i + j][k] != null)
-                                nodeList[i + j][k].connect(nodeList[i][k]);
-                        if (k < 2)
-                            if(random.Next(0,3) == 2 && nodeList[i + j][k + 1] != null)
-                                nodeList[i + j][k + 1].connect(nodeList[i][k]);
-                    }
-
-            for (int i = 1; i < columnCount; i++)
-                for (int j = 0; j < 3; j++)
+                if (pathLength == 1 || i == pathLength - 1)
                 {
-                    Node node = nodeList[i][j];
-                    if(node != null)
+                    if (end.id == "exit")
+                        node.connect(end);
+                    else
                     {
-                        if (!node.connectedWithStart)
-                        {
-                            List<Node> list = new List<Node>();
-                            for (int k = -1; k < 2; k++)
-                            {
-                                if (j == 0)
-                                {
-
-                                }
-                                if (j == 1)
-                                {
-
-                                }
-                                if (j == 2)
-                                {
-
-                                }
-                            }
-                        }
+                        Bridge endBridge = (Bridge)end;
+                        endBridge.connectToNodeOfSameZone(node);
                     }
                 }
 
-            return null;
-        }*/
+                if (i == 0)
+                {
+                    if (start.id == "start")
+                        node.connect(start);
+                    else
+                    {
+                        Bridge startBridge = (Bridge)start;
+                        startBridge.connectToNodeOfNextZone(node);
+                    }
+                    continue;
+                }
 
-        //Credits to https://stackoverflow.com/questions/273313/randomize-a-listt
-        public void Shuffle(List<Node> list)
-        {
-            int n = list.Count;
-            while (n > 1)
-            {
-                n--;
-                int k = random.Next(n + 1);
-                Node value = list[k];
-                list[k] = list[n];
-                list[n] = value;
+                node.connect(path[i - 1]);
             }
+
+            return path;
         }
 
-        bool[,] permutations = new bool[7, 3] { { true, false, false }, { false, true, false }, { false, false, true }, { true, true, false }, { false, true, true }, { true, false, true }, { true, true, true } };
+        public double calculateConnectivity(List<Node> zone)
+        {
+            double result = 0.0;
+            foreach (Node node in zone)
+                result += node.neighbors.Count;
+
+            return result / zone.Count;
+
+        }
 
         /* Return a shortest path between node u and node v */
         public List<Node> shortestpath(Node u, Node v) { throw new NotImplementedException(); }
@@ -199,12 +162,21 @@ namespace STVRogue.GameLogic
     public class Node
     {
         public String id;
+        public int zoneId;
+        public int pathId;
+        public int nodeId;
         public List<Node> neighbors = new List<Node>();
         public List<Pack> packs = new List<Pack>();
         public List<Item> items = new List<Item>();
 
         public Node() { }
         public Node(String id) { this.id = id; }
+
+        public Node(int zoneId, int pathId, int nodeId)
+        {
+            this.zoneId = zoneId; this.pathId = pathId; this.nodeId = nodeId;
+            id = zoneId + "." + pathId + "." + nodeId;
+        }
 
         /* To connect this node to another node. */
         public void connect(Node nd)
