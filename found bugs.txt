@@ -1,0 +1,5 @@
+moving a pack checks current node's capacity, instead of target node's capacity
+player hp does not get set at the start of the game
+if an item was alreay used, the effect still occured (healing potion and crystal)
+player has a dungeon attribute that is never set, but used 
+for shortest path the first node was the starting node, which caused problems with movePack
