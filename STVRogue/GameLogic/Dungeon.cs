@@ -200,14 +200,17 @@ namespace STVRogue.GameLogic
         public void disconnect(Bridge b)
         {
             Logger.log("Disconnecting the bridge " + b.id + " from its zone.");
-            throw new NotImplementedException();
+            foreach(Node node in b.fromNodes)
+                b.disconnect(node);
+
+            startNode = b;
         }
 
         /* To calculate the level of the given node. */
         public uint level(Node d)
         {
             if (utils.isBridge(startNode, exitNode, d))
-                return UInt32.Parse(d.id);
+                return utils.countNumberOfBridges(startNode, d) + 1;
             else
                 return 0;
         }
@@ -257,8 +260,8 @@ namespace STVRogue.GameLogic
 
     public class Bridge : Node
     {
-        List<Node> fromNodes = new List<Node>();
-        List<Node> toNodes = new List<Node>();
+        public List<Node> fromNodes = new List<Node>();
+        public List<Node> toNodes = new List<Node>();
         public Bridge(String id) : base(id) { }
 
         /* Use this to connect the bridge to a node from the same zone. */

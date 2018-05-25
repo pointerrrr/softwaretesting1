@@ -44,8 +44,10 @@ namespace STVRogue.GameLogic
         public List<Item> bag = new List<Item>();
         public Player()
         {
+            //this.dungeon = dungeon;
             id = "player";
             AttackRating = 5;
+            HP = HPbase;
         }
 
         public void use(Item item)

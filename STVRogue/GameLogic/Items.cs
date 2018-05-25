@@ -41,8 +41,9 @@ namespace STVRogue.GameLogic
 
         override public void use(Player player)
         {
+            if(!used)
+                player.HP = (int)Math.Min(player.HPbase, player.HP + HPvalue);
             base.use(player);
-            player.HP = (int)Math.Min(player.HPbase, player.HP + HPvalue);
         }
     }
 
@@ -51,9 +52,12 @@ namespace STVRogue.GameLogic
         public Crystal(String id) : base(id) { }
         override public void use(Player player)
         {
+            if (!used)
+            {
+                player.accelerated = true;
+                if (player.location is Bridge) player.dungeon.disconnect(player.location as Bridge);
+            }
             base.use(player);
-            player.accelerated = true;
-            if (player.location is Bridge) player.dungeon.disconnect(player.location as Bridge);
         }
     }
 }
