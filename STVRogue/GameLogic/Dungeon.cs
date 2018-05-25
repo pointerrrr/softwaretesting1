@@ -192,6 +192,7 @@ namespace STVRogue.GameLogic
             }
 
             result.Reverse();
+            result.RemoveAt(0);
             return result;
         }
 

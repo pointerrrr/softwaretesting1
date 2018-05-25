@@ -40,7 +40,7 @@ namespace STVRogue.GameLogic
             n3.connect(n4);
             n4.connect(n6);
 
-            List<Node> shortest_path = new List<Node>{ n0, n2, n6 };
+            List<Node> shortest_path = new List<Node>{ n2, n6 };
 
             List<Node> result_path = dungeon.shortestpath(n0, n6);
 
