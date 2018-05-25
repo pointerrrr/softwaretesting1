@@ -15,6 +15,7 @@ namespace STVRogue.GameLogic
         public uint difficultyLevel;
         /* a constant multiplier that determines the maximum number of monster-packs per node: */
         public uint M;
+        private Predicates utils = new Predicates();
 
         /* To create a new dungeon with the specified difficult level and capacity multiplier */
         public Dungeon(uint level, uint nodeCapacityMultiplier)
@@ -27,17 +28,24 @@ namespace STVRogue.GameLogic
 
             Node start = new Node("start");            
             Node exit = new Node("exit");
-            List<List<Node>> zones = new List<List<Node>>();
             Bridge[] bridges = new Bridge[level];
             
             for(int i = 0; i <= level; i++)
             {
                 if(i < level)
                     bridges[i] = new Bridge((i+1).ToString());
-                zones.Add( generateZone(i, i == 0 ? start : bridges[i-1], i == level ? exit : bridges[i]));
+                generateZone(i, i == 0 ? start : bridges[i-1], i == level ? exit : bridges[i]);
             }
             startNode = start;
             exitNode = exit;
+
+
+            if (utils.isValidDungeon(startNode, exitNode, difficultyLevel))
+                Logger.log("Created a valid dungeon");
+            else
+                throw new Exception("Created dungeon is invalid");
+
+            List<Node> test = shortestpath(start, exit);
         }
 
         // Generate a zone by creating 2 paths to the next bridge and adding random connections in between those paths
@@ -145,7 +153,47 @@ namespace STVRogue.GameLogic
         }
 
         /* Return a shortest path between node u and node v */
-        public List<Node> shortestpath(Node u, Node v) { throw new NotImplementedException(); }
+        public List<Node> shortestpath(Node u, Node v)
+        {
+            List<Node> result = new List<Node>();
+            Queue<Node> queue = new Queue<Node>();
+            Dictionary<Node, Node> passed = new Dictionary<Node, Node>();
+
+            // BFS using a queue
+            bool found = false;
+            queue.Enqueue(u);
+            passed.Add(u, null);
+            while(queue.Count != 0 && !found)
+            {
+                Node currentNode = queue.Dequeue();
+                foreach (Node neigbor in currentNode.neighbors)
+                {
+                    if(!passed.ContainsKey(neigbor))
+                        passed.Add(neigbor, currentNode);
+                    if(neigbor == v)
+                    {
+                        found = true;
+                        break;
+                    }
+                    if (!queue.Contains(neigbor))
+                        queue.Enqueue(neigbor);
+                }
+            }
+
+            // Reroute back from v to u and set up path
+            result.Add(v);
+            Node previous = passed[v];
+            result.Add(previous);
+
+            while (previous != u)
+            {
+                previous = passed[previous];
+                result.Add(previous);
+            }
+
+            result.Reverse();
+            return result;
+        }
 
 
         /* To disconnect a bridge from the rest of the zone the bridge is in. */
@@ -156,7 +204,13 @@ namespace STVRogue.GameLogic
         }
 
         /* To calculate the level of the given node. */
-        public uint level(Node d) { throw new NotImplementedException(); }
+        public uint level(Node d)
+        {
+            if (utils.isBridge(startNode, exitNode, d))
+                return UInt32.Parse(d.id);
+            else
+                return 0;
+        }
     }
 
     public class Node
