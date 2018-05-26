@@ -43,12 +43,16 @@ namespace STVRogue.GameLogic
             }
             startNode = start;
             exitNode = exit;
+            
+            testDungeon(this);
+        }
 
-
-            if (utils.isValidDungeon(startNode, exitNode, difficultyLevel))
+        public static void testDungeon(Dungeon dungeon)
+        {
+            if (dungeon.utils.isValidDungeon(dungeon.startNode, dungeon.exitNode, dungeon.difficultyLevel))
                 Logger.log("Created a valid dungeon");
             else
-                throw new Exception("Created dungeon is invalid");
+                throw new GameCreationException();
         }
 
         // Generate a zone by creating 2 paths to the next bridge and adding random connections in between those paths
