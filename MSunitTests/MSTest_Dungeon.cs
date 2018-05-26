@@ -8,7 +8,7 @@ namespace STVRogue.GameLogic
     [TestClass]
     public class MSTest_Dungeon
     {
-        Dungeon dungeon = new Dungeon(1, 1);
+        Dungeon dungeon = new Dungeon(1, 1, 0);
         Predicates utils = new Predicates();
 
         [TestMethod]
@@ -88,7 +88,7 @@ namespace STVRogue.GameLogic
         [TestMethod]
         public void MSTest_level()
         {
-            Dungeon testDungeon = new Dungeon(1, 1);
+            Dungeon testDungeon = new Dungeon(1, 1, 0);
 
             // start--b1--exit
             //   |    |
@@ -117,7 +117,7 @@ namespace STVRogue.GameLogic
         [TestMethod]
         public void MSTest_bridge_disconnect()
         {
-            Dungeon testDungeon = new Dungeon(1, 1);
+            Dungeon testDungeon = new Dungeon(1, 1, 0);
 
             //        n0--n1--    n3--n4--   n6--n7--
             //        |       |   |      |   |      |
@@ -169,6 +169,46 @@ namespace STVRogue.GameLogic
                 Assert.IsFalse(reachable.Contains(node));
             foreach (Node node in connected)
                 Assert.IsTrue(reachable.Contains(node));
+        }
+
+        [TestMethod]
+        public void MSTest_population_possible()
+        {
+            Dungeon testDungeon = new Dungeon(2, 2, 6);
+            Queue<Node> queue = new Queue<Node>();
+            List<Node> passed = new List<Node>();
+            Predicates predicates = new Predicates();
+            int[] zoneMonsterCount = new int[] { 0, 0, 0 };
+            // BFS using a queue
+            queue.Enqueue(testDungeon.startNode);
+            passed.Add(testDungeon.startNode);
+            while (queue.Count != 0)
+            {
+                Node currentNode = queue.Dequeue();
+                foreach (Node neighbor in currentNode.neighbors)
+                {
+                    if (!passed.Contains(neighbor))
+                    {
+                        passed.Add(neighbor);
+                        queue.Enqueue(neighbor);
+                    }
+
+                }
+
+                foreach (Pack pack in currentNode.packs)
+                    zoneMonsterCount[currentNode.zoneId - 1] += pack.members.Count;
+            }
+
+            Assert.IsTrue(zoneMonsterCount[0] == 1);
+            Assert.IsTrue(zoneMonsterCount[1] == 2);
+            Assert.IsTrue(zoneMonsterCount[2] == 3);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(GameCreationException))]
+        public void MSTest_population_impossible()
+        {
+            Dungeon testDungeon = new Dungeon(2, 2, 80);
         }
     }
 }

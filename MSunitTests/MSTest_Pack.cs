@@ -8,7 +8,7 @@ namespace STVRogue.GameLogic
     [TestClass]
     public class MSTest_Pack
     {
-        public Dungeon testDungeon = new Dungeon(1, 20);
+        public Dungeon testDungeon = new Dungeon(1, 20, 0);
 
         //        n0--n1--    n3--n4--   n6--n7--
         //        |       |   |      |   |      |

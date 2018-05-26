@@ -11,7 +11,7 @@ namespace STVRogue
     {
         static void Main(string[] args)
         {
-            Game game = new Game(5, 2, 20);
+            Game game = new Game(5, 4, 20);
             game.player.location = new Node("a dummy node");
             while (true)
             {

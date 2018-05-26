@@ -75,19 +75,20 @@ namespace STVRogue.GameLogic
                 int packCount = foe_.pack.members.Count;
                 foe_.pack.members.RemoveAll(target => target.HP <= 0);
                 KillPoint += (uint) (packCount - foe_.pack.members.Count) ;
-                /* Wrong implementation; can't remove while iterating:
+                List<Monster> alive = new List<Monster>();
                 foreach (Monster target in foe_.pack.members)
                 {
                     base.Attack(target);
-                    if (target.HP == 0)
-                    {
-                        foe_.pack.members.Remove(foe_);
+                    if (target.HP != 0)
+                        alive.Add(target);
+                    else
                         KillPoint++;
-                    }
                 }
-                */
+                foe_.pack.members = alive;
                 accelerated = false;
             }
+            if (foe_.pack.members.Count == 0)
+                foe_.pack.location.packs.Remove(foe_.pack);
         }
     }
 }

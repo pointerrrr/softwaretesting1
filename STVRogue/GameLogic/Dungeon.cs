@@ -15,16 +15,18 @@ namespace STVRogue.GameLogic
         public uint difficultyLevel;
         /* a constant multiplier that determines the maximum number of monster-packs per node: */
         public uint M;
+        public uint numberOfMonsters;
         private Predicates utils = new Predicates();
 
         /* To create a new dungeon with the specified difficult level and capacity multiplier */
-        public Dungeon(uint level, uint nodeCapacityMultiplier)
+        public Dungeon(uint level, uint nodeCapacityMultiplier, uint numberOfMonsters)
         {
             RandomGenerator.initializeWithSeed(1337);
             random = RandomGenerator.rnd;
             Logger.log("Creating a dungeon of difficulty level " + level + ", node capacity multiplier " + nodeCapacityMultiplier + ".");
             difficultyLevel = level;
             M = nodeCapacityMultiplier;
+            this.numberOfMonsters = numberOfMonsters;
 
             Node start = new Node("start");            
             Node exit = new Node("exit");
@@ -33,8 +35,11 @@ namespace STVRogue.GameLogic
             for(int i = 0; i <= level; i++)
             {
                 if(i < level)
+                {
                     bridges[i] = new Bridge((i+1).ToString());
-                generateZone(i, i == 0 ? start : bridges[i-1], i == level ? exit : bridges[i]);
+                }
+
+                generateZone(i + 1, i == 0 ? start : bridges[i-1], i == level ? exit : bridges[i]);
             }
             startNode = start;
             exitNode = exit;
@@ -44,16 +49,14 @@ namespace STVRogue.GameLogic
                 Logger.log("Created a valid dungeon");
             else
                 throw new Exception("Created dungeon is invalid");
-
-            List<Node> test = shortestpath(start, exit);
         }
 
         // Generate a zone by creating 2 paths to the next bridge and adding random connections in between those paths
-        public List<Node> generateZone(int zoneId, Node start, Node end)
+        public List<Node> generateZone(int zoneLevel, Node start, Node end)
         {
             List<Node> zone = new List<Node>();
-            zone.AddRange(createLinearPath(start, end, random.Next(1, 4), zoneId, 1));
-            zone.AddRange(createLinearPath(start, end, random.Next(1, 4), zoneId, 2));
+            zone.AddRange(createLinearPath(start, end, random.Next(1, 4), zoneLevel, 1));
+            zone.AddRange(createLinearPath(start, end, random.Next(1, 4), zoneLevel, 2));
 
             int counter = 0;
             while (random.NextDouble() < 0.75 && counter < 5)
@@ -94,10 +97,45 @@ namespace STVRogue.GameLogic
                     continue;
                 }
 
-                Node newNode = new Node(zoneId, 3, nodeId);
+                Node newNode = new Node(zoneLevel, 3, nodeId);
                 newNode.connect(zone[0]);
                 zone.Add(newNode);
                 nodeId++;
+            }
+
+            int monsterCount = (int)((2 * zoneLevel * numberOfMonsters) / ((difficultyLevel + 2) * (difficultyLevel + 1)) + 0.5f);
+            if (monsterCount > zone.Count * M)
+                throw new GameCreationException();
+            while (monsterCount > 0)
+            {
+                Monster monster = new Monster(monsterCount.ToString());
+                Node temp = zone[random.Next(zone.Count)];
+                int occupation = 0;
+                foreach(Pack pack in temp.packs)
+                    occupation += pack.members.Count;
+                if (occupation < M)
+                {
+                    if (temp.packs.Count == 0)
+                    {
+                        Pack pack = new Pack(temp.id + " " + monsterCount, 0);
+                        pack.members.Add(monster);
+                        pack.location = temp;
+                        temp.packs.Add(pack);
+                    }
+                    else
+                    {
+                        if (random.NextDouble() < 0.25)
+                        {
+                            Pack pack = new Pack(temp.id + " " + monsterCount, 0);
+                            pack.members.Add(monster);
+                            pack.location = temp;
+                            temp.packs.Add(pack);
+                        }
+                        else
+                            temp.packs[random.Next(temp.packs.Count)].members.Add(monster);
+                    }
+                    monsterCount--;
+                }
             }
 
             return zone;

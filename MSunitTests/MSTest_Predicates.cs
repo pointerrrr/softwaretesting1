@@ -34,7 +34,7 @@ namespace STVRogue.Utils
         [TestMethod]
         public void MSTest_EndReachable()
         {
-            Dungeon dungeon = new Dungeon(4, 9);
+            Dungeon dungeon = new Dungeon(4, 9, 0);
             
             Predicates utils = new Predicates();
             bool endFound = utils.isReachable(dungeon.startNode, dungeon.exitNode);
