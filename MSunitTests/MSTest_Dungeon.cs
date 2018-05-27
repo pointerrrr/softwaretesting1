@@ -210,5 +210,22 @@ namespace STVRogue.GameLogic
         {
             Dungeon testDungeon = new Dungeon(2, 2, 80);
         }
+
+        [TestMethod]
+        public void MSTest_valid_dungeon_check_valid_dungeon()
+        {
+            Dungeon.TestDungeon(dungeon.startNode, dungeon.exitNode, dungeon.difficultyLevel);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(GameCreationException))]
+        public void MSTest_valid_dungeon_check_invalid_dungeon()
+        {
+            Dungeon invalidDungeon = dungeon;
+            dungeon.startNode.connect(new Node());
+            dungeon.startNode.connect(new Node());
+            dungeon.startNode.connect(new Node());
+            Dungeon.TestDungeon(invalidDungeon.startNode, invalidDungeon.exitNode, invalidDungeon.difficultyLevel);
+        }
     }
 }

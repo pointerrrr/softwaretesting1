@@ -44,12 +44,13 @@ namespace STVRogue.GameLogic
             startNode = start;
             exitNode = exit;
             
-            testDungeon(this);
+            TestDungeon(startNode, exitNode, difficultyLevel);
         }
 
-        public static void testDungeon(Dungeon dungeon)
+        public static void TestDungeon(Node startNode, Node exitNode, uint difficultyLevel)
         {
-            if (dungeon.utils.isValidDungeon(dungeon.startNode, dungeon.exitNode, dungeon.difficultyLevel))
+            Predicates utils = new Predicates();
+            if (utils.isValidDungeon(startNode, exitNode, difficultyLevel))
                 Logger.log("Created a valid dungeon");
             else
                 throw new GameCreationException();
@@ -119,7 +120,7 @@ namespace STVRogue.GameLogic
                     occupation += pack.members.Count;
                 if (occupation < M)
                 {
-                    if (temp.packs.Count == 0)
+                    if (temp.packs.Count == 0 || random.NextDouble() < 0.25)
                     {
                         Pack pack = new Pack(temp.id + " " + monsterCount, 0);
                         pack.members.Add(monster);
@@ -128,15 +129,7 @@ namespace STVRogue.GameLogic
                     }
                     else
                     {
-                        if (random.NextDouble() < 0.25)
-                        {
-                            Pack pack = new Pack(temp.id + " " + monsterCount, 0);
-                            pack.members.Add(monster);
-                            pack.location = temp;
-                            temp.packs.Add(pack);
-                        }
-                        else
-                            temp.packs[random.Next(temp.packs.Count)].members.Add(monster);
+                        temp.packs[random.Next(temp.packs.Count)].members.Add(monster);
                     }
                     monsterCount--;
                 }
