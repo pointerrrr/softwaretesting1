@@ -80,7 +80,7 @@ namespace STVRogue.GameLogic
 
             List<Node> nodes = new List<Node>{ n0, n1, n2, n3, n4, n5, n6, n7, n8, n9 };
             double expected_conn = 20 / 9;
-            double actual_conn = dungeon.calculateConnectivity(nodes);
+            double actual_conn = Dungeon.calculateConnectivity(nodes);
 
             Assert.IsTrue(expected_conn == actual_conn);
         }
@@ -234,6 +234,36 @@ namespace STVRogue.GameLogic
         {
             Node test = new Node();
             test.fight(new Player());
+        }
+
+        [TestMethod]
+        public void High_connectivity_node_four_neightbors_disconnect()
+        {
+            List<Node> zone = new List<Node>();
+            Node n1 = new Node();
+            Node n2 = new Node();
+            Node n3 = new Node();
+            Node n4 = new Node();
+            Node n5 = new Node();
+            n1.connect(n2);
+            n1.connect(n3);
+            n1.connect(n4);
+            n1.connect(n5);
+            n2.connect(n3);
+            n2.connect(n4);
+            n2.connect(n5);
+            n3.connect(n4);
+            n3.connect(n5);
+            n4.connect(n5);
+
+            zone.Add(n1);
+            zone.Add(n2);
+            zone.Add(n3);
+            zone.Add(n4);
+            zone.Add(n5);
+
+            Dungeon.highConnectivitySolution(zone, 1);
+            Assert.IsTrue(Dungeon.calculateConnectivity(zone) <= 3);
         }
     }
 }

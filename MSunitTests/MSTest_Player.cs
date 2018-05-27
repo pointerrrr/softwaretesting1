@@ -150,7 +150,7 @@ namespace STVRogue.GameLogic
         public void MSTest_attack_non_monster()
         {
             Player p = new Player();
-            p.Attack(p);
+            p.Attack(p);            
         }
     }
 }

@@ -70,8 +70,8 @@ namespace STVRogue.GameLogic
                 Node nodeB = zone[random.Next(zone.Count)];
 
                 if (nodeA.id != nodeB.id)
-                    if (nodeA.neighbors.Count < 4 && nodeB.neighbors.Count < 4
-                        && !nodeA.neighbors.Contains(nodeB))
+                    if (nodeA.neighbors.Count < 4 & nodeB.neighbors.Count < 4
+                        & !nodeA.neighbors.Contains(nodeB))
                     {
                         nodeA.connect(nodeB);
                         continue;
@@ -80,33 +80,7 @@ namespace STVRogue.GameLogic
                 counter++;
             }
 
-            counter = 0;
-            int nodeId = 0;
-            // Disconnect or add new nodes untill connectivity falls below 3.0
-            while(calculateConnectivity(zone) > 3.0)
-            {
-                zone.Sort((nodeA, nodeB) => nodeA.neighbors.Count.CompareTo(nodeB.neighbors.Count));
-                
-                // If all nodes are full, disconnect with a node from the other path
-                if (zone[0].neighbors.Count == 4)
-                {
-                    Node fullNode = zone[counter];
-                    Node toDisconnect = fullNode.neighbors.Find(node => node.pathId != fullNode.pathId && node.pathId != 0);
-                    if (toDisconnect == null)
-                    {
-                        counter++;
-                        continue;
-                    }
-                    fullNode.disconnect(toDisconnect);
-                    counter = 0;
-                    continue;
-                }
-
-                Node newNode = new Node(zoneLevel, 3, nodeId);
-                newNode.connect(zone[0]);
-                zone.Add(newNode);
-                nodeId++;
-            }
+            highConnectivitySolution(zone, zoneLevel);
 
             int monsterCount = (int)((2 * zoneLevel * numberOfMonsters) / ((difficultyLevel + 2) * (difficultyLevel + 1)) + 0.5f);
             if (monsterCount > zone.Count * M)
@@ -136,6 +110,65 @@ namespace STVRogue.GameLogic
             }
 
             return zone;
+        }
+
+        public static void highConnectivitySolution(List<Node> zone, int zoneLevel)
+        {
+            bool canConnect = false;
+            Random rnd = RandomGenerator.rnd;
+            while (calculateConnectivity(zone) > 3)
+            {
+                List<Node> newNodes = new List<Node>();
+                canConnect = false;
+                foreach (Node node in zone)
+                    if (node.neighbors.Count < 4)
+                    {
+                        Node n = new Node(zoneLevel.ToString());
+                        node.connect(n);
+                        newNodes.Add(n);
+                        canConnect = true;
+                    }
+                zone.AddRange(newNodes);
+                if (!canConnect)
+                {
+                    
+                    int idx = rnd.Next(0, zone.Count - 1);
+                    int idx2 = rnd.Next(0, zone[idx].neighbors.Count - 1);
+                    Node n2 = zone[idx].neighbors[idx2];
+                    zone[idx].disconnect(n2);
+                    Node n = new Node(zoneLevel.ToString());
+                    n.connect(n2);                    
+                    n.connect(zone[idx]);
+                    zone.Add(n);
+                }
+            }
+            /*int counter = 0;
+            int nodeId = 0;
+            // Disconnect or add new nodes untill connectivity falls below 3.0
+            while (calculateConnectivity(zone) > 3.0)
+            {
+                zone.Sort((nodeA, nodeB) => nodeA.neighbors.Count.CompareTo(nodeB.neighbors.Count));
+
+                // If all nodes are full, disconnect with a node from the other path
+                if (zone[0].neighbors.Count == 4)
+                {
+                    Node fullNode = zone[counter];
+                    Node toDisconnect = fullNode.neighbors.Find(node => node.pathId != fullNode.pathId && node.pathId != 0);
+                    if (toDisconnect == null)
+                    {
+                        counter++;
+                        continue;
+                    }
+                    fullNode.disconnect(toDisconnect);
+                    counter = 0;
+                    continue;
+                }
+
+                Node newNode = new Node(zoneLevel, 3, nodeId);
+                newNode.connect(zone[0]);
+                zone.Add(newNode);
+                nodeId++;
+            }*/
         }
 
         // Create direct path of given length between start and end bridge
@@ -177,7 +210,7 @@ namespace STVRogue.GameLogic
             return path;
         }
 
-        public double calculateConnectivity(List<Node> zone)
+        public static double calculateConnectivity(List<Node> zone)
         {
             double result = 0.0;
             foreach (Node node in zone)
@@ -198,7 +231,7 @@ namespace STVRogue.GameLogic
             bool found = false;
             queue.Enqueue(u);
             passed.Add(u, null);
-            while(queue.Count != 0 && !found)
+            while(queue.Count != 0 & !found)
             {
                 Node currentNode = queue.Dequeue();
                 foreach (Node neigbor in currentNode.neighbors)
