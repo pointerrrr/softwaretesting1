@@ -227,5 +227,13 @@ namespace STVRogue.GameLogic
             dungeon.startNode.connect(new Node());
             Dungeon.TestDungeon(invalidDungeon.startNode, invalidDungeon.exitNode, invalidDungeon.difficultyLevel);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(NotImplementedException))]
+        public void MSTest_fight_exception_thrown()
+        {
+            Node test = new Node();
+            test.fight(new Player());
+        }
     }
 }

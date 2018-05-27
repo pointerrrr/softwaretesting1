@@ -19,7 +19,7 @@ namespace STVRogue.Utils
         }
     }
 
-    public class RandomGenerator
+    public static class RandomGenerator
     {
         static private Random rnd_ = null;
         static public Random rnd
@@ -34,6 +34,11 @@ namespace STVRogue.Utils
         static public void initializeWithSeed(int seed)
         {
             rnd_ = new Random(seed);
+        }
+
+        public static void clearRNG()
+        {
+            rnd_ = null;
         }
     }
 }
