@@ -6,10 +6,6 @@ using System.Threading.Tasks;
 
 namespace STVRogue.Utils
 {
-    class Utils
-    {
-    }
-
     public class Logger
     {
         /* You can change the behavior of this logger. */

@@ -1,5 +1,4 @@
-﻿using System;
-namespace STVRogue
+﻿namespace STVRogue
 {
     public class Command
     {

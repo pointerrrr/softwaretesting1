@@ -1,11 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using STVRogue.GameLogic;
 using STVRogue.Utils;
 
 namespace UnitTests_STVRogue
@@ -28,7 +23,7 @@ namespace UnitTests_STVRogue
             RandomGenerator.initializeWithSeed(1337);
             Random rng = RandomGenerator.rnd;
             int next = rng.Next();
-            // 448584296 is the first number Random generates with seed 1337
+            // 448584296 is the first number Random.Next() generates with seed 1337
             Assert.AreEqual(next, 448584296);
         }
 

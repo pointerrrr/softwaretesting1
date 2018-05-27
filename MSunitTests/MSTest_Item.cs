@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using STVRogue.Utils;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace STVRogue.GameLogic
 {

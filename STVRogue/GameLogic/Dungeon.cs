@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using STVRogue.Utils;
 
 namespace STVRogue.GameLogic
@@ -166,33 +163,6 @@ namespace STVRogue.GameLogic
                     zone.Add(n);
                 }
             }
-            /*int counter = 0;
-            int nodeId = 0;
-            // Disconnect or add new nodes untill connectivity falls below 3.0
-            while (calculateConnectivity(zone) > 3.0)
-            {
-                zone.Sort((nodeA, nodeB) => nodeA.neighbors.Count.CompareTo(nodeB.neighbors.Count));
-
-                // If all nodes are full, disconnect with a node from the other path
-                if (zone[0].neighbors.Count == 4)
-                {
-                    Node fullNode = zone[counter];
-                    Node toDisconnect = fullNode.neighbors.Find(node => node.pathId != fullNode.pathId && node.pathId != 0);
-                    if (toDisconnect == null)
-                    {
-                        counter++;
-                        continue;
-                    }
-                    fullNode.disconnect(toDisconnect);
-                    counter = 0;
-                    continue;
-                }
-
-                Node newNode = new Node(zoneLevel, 3, nodeId);
-                newNode.connect(zone[0]);
-                zone.Add(newNode);
-                nodeId++;
-            }*/
         }
 
         // Create direct path of given length between start and end bridge

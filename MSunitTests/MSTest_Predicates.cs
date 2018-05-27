@@ -138,9 +138,6 @@ namespace STVRogue.Utils
             b1.connect(b2);
             b2.connect(nodeExit);
 
-            
-            
-
             Assert.IsFalse(pred.isValidDungeon(nodeStart, nodeExit, 2));
         }
 
@@ -210,8 +207,7 @@ namespace STVRogue.Utils
             n3.connect(n5);
             n3.connect(n6);
             n4.connect(n5);
-            n5.connect(n6);
-            
+            n5.connect(n6);            
 
             Assert.IsFalse(pred.isValidDungeon(nodeStart, nodeExit, 1));
         }
