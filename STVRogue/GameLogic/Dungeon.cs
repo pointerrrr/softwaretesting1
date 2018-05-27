@@ -16,6 +16,7 @@ namespace STVRogue.GameLogic
         /* a constant multiplier that determines the maximum number of monster-packs per node: */
         public uint M;
         public uint numberOfMonsters;
+        public int totalMonsterHP = 0;
         private Predicates utils = new Predicates();
 
         /* To create a new dungeon with the specified difficult level and capacity multiplier */
@@ -45,6 +46,28 @@ namespace STVRogue.GameLogic
             exitNode = exit;
             
             TestDungeon(startNode, exitNode, difficultyLevel);
+            AddItems();
+
+        }
+
+        public void AddItems()
+        {
+            List<Node> allNodes = utils.reachableNodes(startNode);
+            int totalHealth = 0;
+            while (totalHealth + 100 < 0.8f * totalMonsterHP - 10)
+            {
+                HealingPotion pot = new HealingPotion(totalHealth.ToString());
+                allNodes[random.Next(0, allNodes.Count)].items.Add(pot);
+                totalHealth += (int)pot.HPvalue;
+            }
+
+            int crystals = random.Next(1, (int)difficultyLevel * 2);
+
+            for(int i = 0; i < crystals; i++)
+            {
+                Crystal crystal = new Crystal(i.ToString());
+                allNodes[random.Next(0, allNodes.Count)].items.Add(crystal);
+            }
         }
 
         public static void TestDungeon(Node startNode, Node exitNode, uint difficultyLevel)
@@ -88,6 +111,7 @@ namespace STVRogue.GameLogic
             while (monsterCount > 0)
             {
                 Monster monster = new Monster(monsterCount.ToString());
+                totalMonsterHP += monster.HP;
                 Node temp = zone[random.Next(zone.Count)];
                 int occupation = 0;
                 foreach(Pack pack in temp.packs)
@@ -323,6 +347,7 @@ namespace STVRogue.GameLogic
          */
         public void fight(Player player)
         {
+            
             throw new NotImplementedException();
         }
     }

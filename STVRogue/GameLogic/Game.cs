@@ -25,7 +25,7 @@ namespace STVRogue.GameLogic
                        + nodeCapcityMultiplier + ", and " + numberOfMonsters + " monsters.");
             player = new Player();
             dungeon = new Dungeon(difficultyLevel, nodeCapcityMultiplier, numberOfMonsters);
-
+            player.HP =  (int) Math.Max(1, Math.Min(100, dungeon.totalMonsterHP * 0.8));
         }
 
         /*

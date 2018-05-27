@@ -19,6 +19,7 @@ namespace UnitTests_STVRogue
             RandomGenerator.clearRNG();
             Random rng = RandomGenerator.rnd;
             Assert.IsNotNull(rng);
+            RandomGenerator.initializeWithSeed(1337);
         }
 
         [TestMethod]

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using STVRogue;
+using STVRogue.GameLogic;
 
 namespace UnitTests_STVRogue
 {
@@ -12,23 +13,23 @@ namespace UnitTests_STVRogue
     public class MSTest_Game
     {
         [TestMethod]
-        public void new_game()
+        public void MSTest_new_game()
         {
-            STVRogue.GameLogic.Game game = new STVRogue.GameLogic.Game(2, 2, 6);
+            Game game = new Game(2, 2, 6);
         }
 
         [TestMethod]
-        public void update_test()
+        public void MSTest_update()
         {
-            STVRogue.GameLogic.Game game = new STVRogue.GameLogic.Game(2, 2, 6);
+            Game game = new Game(2, 2, 6);
             Assert.IsTrue(game.update(new Command()));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(STVRogue.GameLogic.GameCreationException))]
-        public void game_creation_exception_with_explanation()
+        [ExpectedException(typeof(GameCreationException))]
+        public void MSTest_game_creation_exception_with_explanation()
         {
-            throw new STVRogue.GameLogic.GameCreationException("test");
+            throw new GameCreationException("test");
         }
     }
 }

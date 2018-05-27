@@ -12,14 +12,14 @@ namespace UnitTests_STVRogue
     public class MSTest_Commands
     {
         [TestMethod]
-        public void test_constructor()
+        public void MSTest_constructor()
         {
             STVRogue.Command cmd = new STVRogue.Command();
             Assert.IsNotNull(cmd);
         }
 
         [TestMethod]
-        public void test_cmd_to_string()
+        public void MSTest_cmd_to_string()
         {
             STVRogue.Command cmd = new STVRogue.Command();
             Assert.AreEqual("no-action", cmd.ToString());

@@ -48,6 +48,24 @@ namespace STVRogue.GameLogic
         }
 
         [TestMethod]
+        public void MSTest_big_dungeon_health_potions()
+        {
+            Dungeon d = new Dungeon(10, 999, 1000);
+            Predicates p = new Predicates();
+            List<Node> nodes = p.reachableNodes(d.startNode);
+            bool hpPotion = false;
+            bool crystal = false;
+            foreach (Node n in nodes)
+            {
+                if (n.items.Find((o) => { return o.GetType() == typeof(HealingPotion); }) != null)
+                    hpPotion = true;
+                if (n.items.Find((o) => { return o.GetType() == typeof(Crystal); }) != null)
+                    crystal = true;
+            }
+            Assert.IsTrue(hpPotion && crystal);
+        }
+
+        [TestMethod]
         public void MSTest_calculate_connectivity()
         {
             // n4--n5      n9
@@ -110,8 +128,11 @@ namespace STVRogue.GameLogic
             uint levelBridge = testDungeon.level(b1);
             uint levelNode = testDungeon.level(n0);
 
+            
+
             Assert.IsTrue(levelBridge == 1);
             Assert.IsTrue(levelNode == 0);
+
         }
 
         [TestMethod]
