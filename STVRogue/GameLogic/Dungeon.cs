@@ -322,6 +322,23 @@ namespace STVRogue.GameLogic
         {
             while(contested(player))
             {
+                int monsters = 0;
+                foreach (Pack pack in packs)
+                    monsters += pack.members.Count;
+
+                Console.Clear();
+                Console.WriteLine("** Node is contested!");
+                Console.WriteLine("Player HP: " + player.HP + "/" + player.HPbase);
+                Console.WriteLine("Current location: " + id);
+                Console.WriteLine("Zone level: " + zoneId);
+                Console.WriteLine("Packs: " + packs.Count);
+                Console.WriteLine("Monsters: " + monsters);
+                Console.WriteLine();
+                Console.WriteLine("Bag contains:");
+                Console.WriteLine(player.bag.Count(a => a.GetType() == typeof(HealingPotion)) + " Healing potions");
+                Console.WriteLine(player.bag.Count(a => a.GetType() == typeof(Crystal)) + " Crystals");
+                Console.WriteLine();
+                Console.WriteLine("Possible commands:");
                 Console.WriteLine("i: use item");
                 Console.WriteLine("f: flee");
                 Console.WriteLine("a: attack");
