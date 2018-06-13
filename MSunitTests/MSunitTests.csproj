@@ -57,6 +57,7 @@
     <Compile Include="MSTest_Commands.cs" />
     <Compile Include="MSTest_Dungeon.cs" />
     <Compile Include="MSTest_Game.cs" />
+    <Compile Include="MSTest_GameRules.cs" />
     <Compile Include="MSTest_Item.cs" />
     <Compile Include="MSTest_Pack.cs" />
     <Compile Include="MSTest_Player.cs" />

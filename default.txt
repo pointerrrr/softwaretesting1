@@ -1,0 +1,3 @@
+1337
+5,4,50
+NumPad2,NumPad2,NumPad4,A,A,A,A,NumPad2,NumPad4,I,H,A,A,A,NumPad2,NumPad4,A,NumPad2,NumPad4,A,A,A,A,NumPad2,NumPad4,A,A,A,A,NumPad2,I,C,NumPad1,
