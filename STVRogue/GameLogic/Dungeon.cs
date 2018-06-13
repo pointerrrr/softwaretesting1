@@ -320,6 +320,7 @@ namespace STVRogue.GameLogic
          */
         public void combat(Player player)
         {
+            Console.Clear();
             while(contested(player))
             {
                 int healingPots = player.bag.Count(a => a.GetType() == typeof(HealingPotion));
@@ -329,7 +330,6 @@ namespace STVRogue.GameLogic
                 foreach (Pack pack in packs)
                     monsters += pack.members.Count;
 
-                Console.Clear();
                 Console.WriteLine("** Node is contested!");
                 Console.WriteLine("Player HP: " + player.HP + "/" + player.HPbase);
                 Console.WriteLine("Current location: " + id);
@@ -339,7 +339,7 @@ namespace STVRogue.GameLogic
                 Console.WriteLine("-------------------------------------------");
                 foreach(Pack pack in packs)
                 {
-                    Console.WriteLine("-- Pack '" + pack.id + "' (" + pack.members.Count + " monsters)");
+                    Console.WriteLine("-- Pack '" + pack.id + "' (" + pack.members.Count + (pack.members.Count == 1 ? " monster)" : " monsters)"));
                     foreach (Monster monster in pack.members)
                         Console.WriteLine("---- Monster '" + monster.id + "' | HP: " + monster.HP);
                 }
@@ -361,8 +361,8 @@ namespace STVRogue.GameLogic
                         if (showItems)
                         {
                             Console.WriteLine("Bag contents:");
-                            Console.WriteLine("h: Healing Potion (" + healingPots + " left)");
-                            Console.WriteLine("c: Crystal (" + crystals + " left)");
+                            if(healingPots > 0) Console.WriteLine("h: Healing Potion (" + healingPots + " left)");
+                            if(crystals > 0) Console.WriteLine("c: Crystal (" + crystals + " left)");
                             ConsoleKey item = Console.ReadKey().Key;
 
                             if (item == ConsoleKey.H && healingPots > 0)
