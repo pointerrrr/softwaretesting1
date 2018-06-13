@@ -315,10 +315,68 @@ namespace STVRogue.GameLogic
          * A fight terminates when either the node has no more monster-pack, or when
          * the player's HP is reduced to 0. 
          */
-        public void fight(Player player)
+        public void combat(Player player)
         {
-            
-            throw new NotImplementedException();
+            while(player.HP > 0 && packs.Count > 0)
+            {
+                Console.WriteLine("i: use item");
+                Console.WriteLine("f: flee");
+                Console.WriteLine("a: attack");
+                ConsoleKey action = Console.ReadKey().Key;
+
+                switch (action) {
+                    case ConsoleKey.I:
+                        Console.WriteLine("Bag contents:");
+                        int healingPots = 0;
+                        int crystals = 0;
+                        for(int i = 0; i < player.bag.Count; i++)
+                        {
+                            if (player.bag[i].GetType() == typeof(HealingPotion)) healingPots++;
+                            else crystals++;
+                        }
+                        Console.WriteLine("h: Healing Potion (" + healingPots + " left)");
+                        Console.WriteLine("c: Crystal (" + crystals + " left)");
+                        ConsoleKey item = Console.ReadKey().Key;
+
+                        //TODO: Start pack attacks after item use
+                        if (item == ConsoleKey.H && healingPots > 0)
+                        {
+                            foreach (Item hpot in player.bag)
+                                if (hpot.GetType() == typeof(HealingPotion))
+                                {
+                                    player.use(hpot);
+                                    Console.WriteLine("Used a healing potion. New HP: " + player.HP);
+                                    break;
+                                }
+                        }
+                        else if (item == ConsoleKey.C && crystals > 0)
+                        {
+                            foreach (Item crystal in player.bag)
+                                if (crystal.GetType() == typeof(Crystal))
+                                {
+                                    player.use(crystal);
+                                    Console.WriteLine("Used a crystal. You are now accelerated.");
+                                    break;
+                                }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid command. Try again!");
+                            continue;
+                        }
+
+                        break;
+                    case ConsoleKey.C:
+                        break;
+                    case ConsoleKey.F:
+                        break;
+                    case ConsoleKey.A:
+                        break;
+                    default:
+                        Console.WriteLine("Unknown Command. Try again!");
+                        continue;
+                }
+            }
         }
     }
 
