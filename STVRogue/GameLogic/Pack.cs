@@ -23,6 +23,13 @@ namespace STVRogue.GameLogic
             }
         }
 
+        public void AddMonster(Monster monster)
+        {
+            startingHP += monster.HP;
+            monster.pack = this;
+            members.Add(monster);
+        }
+
         public void Attack(Player p)
         {
             foreach (Monster m in members)

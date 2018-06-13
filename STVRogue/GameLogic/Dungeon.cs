@@ -120,13 +120,13 @@ namespace STVRogue.GameLogic
                     if (temp.packs.Count == 0 || random.NextDouble() < 0.25)
                     {
                         Pack pack = new Pack(temp.id + " " + monsterCount, 0);
-                        pack.members.Add(monster);
+                        pack.AddMonster(monster);
                         pack.location = temp;
                         temp.packs.Add(pack);
                     }
                     else
                     {
-                        temp.packs[random.Next(temp.packs.Count)].members.Add(monster);
+                        temp.packs[random.Next(temp.packs.Count)].AddMonster(monster);
                     }
                     monsterCount--;
                 }
@@ -321,10 +321,28 @@ namespace STVRogue.GameLogic
         {
             while(contested(player))
             {
+                int monsters = 0;
+                foreach (Pack pack in packs)
+                    monsters += pack.members.Count;
+
+                Console.Clear();
+                Console.WriteLine("** Node is contested!");
+                Console.WriteLine("Player HP: " + player.HP + "/" + player.HPbase);
+                Console.WriteLine("Current location: " + id);
+                Console.WriteLine("Zone level: " + zoneId);
+                Console.WriteLine("Packs: " + packs.Count);
+                Console.WriteLine("Monsters: " + monsters);
+                Console.WriteLine();
+                Console.WriteLine("Bag contains:");
+                Console.WriteLine(player.bag.Count(a => a.GetType() == typeof(HealingPotion)) + " Healing potions");
+                Console.WriteLine(player.bag.Count(a => a.GetType() == typeof(Crystal)) + " Crystals");
+                Console.WriteLine();
+                Console.WriteLine("Possible commands:");
                 Console.WriteLine("i: use item");
                 Console.WriteLine("f: flee");
                 Console.WriteLine("a: attack");
                 ConsoleKey action = Console.ReadKey().Key;
+                Console.Clear();
 
                 switch (action) {
                     case ConsoleKey.I:
@@ -362,6 +380,7 @@ namespace STVRogue.GameLogic
                         }
                         else
                         {
+                            Console.Clear();
                             Console.WriteLine("Invalid input. Try again!");
                             continue;
                         }
@@ -373,9 +392,10 @@ namespace STVRogue.GameLogic
                         char key = Console.ReadKey().KeyChar;
                         try
                         {
+                            Console.Clear();
                             player.Move(neighbors[int.Parse(key.ToString()) - 1]);
                         }
-                        catch { Console.WriteLine("Invalid input. Try again!"); continue; }
+                        catch { Console.Clear(); Console.WriteLine("Invalid input. Try again!"); continue; }
                         break;
                     case ConsoleKey.A:
                         player.Attack(packs[0].members[0]);
