@@ -34,23 +34,22 @@ namespace STVRogue.GameLogic
             switch(userCommand.ToString())
             {
                 case "no-action":
-                    return true;
+                    break;
                 case "use-potion":
                     UseHealingPotionCommand usecommand = userCommand as UseHealingPotionCommand;
-                    if (!usecommand.potion.used)
-                    {
-                        usecommand.potion.use(player);
-                        player.bag.Remove(usecommand.potion);
-                        return true;
-                    }
-                    return false;
+                    usecommand.potion.use(player);
+                    player.bag.Remove(usecommand.potion);
+                    break;
                 case "move-to":
                     MoveCommand movecommand = userCommand as MoveCommand;
-                    return player.Move(movecommand.node);
+                    if (!player.Move(movecommand.node))
+                        return false;
+                    break;
                 default:
                     return false;
             }
-            
+
+            return true;
         }
     }
 

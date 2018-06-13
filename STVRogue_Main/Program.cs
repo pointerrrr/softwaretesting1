@@ -14,12 +14,23 @@ namespace STVRogue
             Game game = new Game(5, 4, 50);
             
             game.player.location = game.dungeon.startNode;
+
+            Console.WriteLine("Press a button to start");
+            Console.ReadKey();
+            Console.Clear();
+
             while (true)
             {
-                
+                if (game.player.location == game.dungeon.exitNode)
+                {
+                    Console.WriteLine("You WON!");
+                    Console.ReadKey();
+                    break;
+                }
+
                 
                 Node location = game.player.location;
-                Console.WriteLine("PlayerHp: " + game.player.HP);
+                Console.WriteLine("PlayerHp: " + game.player.HP + "/" + game.player.HPbase);
                 Console.WriteLine("Current location: " + location.id);
                 Console.WriteLine("Bag contains:");
                 Console.WriteLine(game.player.bag.Count(a => a.GetType() == typeof(HealingPotion)) + " healing potions");
@@ -36,27 +47,27 @@ namespace STVRogue
                 }
 
                 Console.WriteLine("d: do nothing");
-                char key = Console.ReadKey().KeyChar;
+                Console.WriteLine("esc: exit");
+                ConsoleKey key = Console.ReadKey().Key;
                 Command update = new Command();
                 try
                 {
+                    if (key == ConsoleKey.Escape)
+                        return;
                     int input = 0;
-                    if( int.TryParse(key.ToString(), out input))
+                    string b = key.ToString();
+                    if( int.TryParse(key.ToString().Last().ToString(), out input))
                     {
                         update = new MoveCommand(location.neighbors[input - 1]);
                     }
-                    if(key == 'h')
+                    if(key == ConsoleKey.H)
                     {
                         update = new UseHealingPotionCommand(game.player.bag.First( (a) => { return a.GetType() == typeof(HealingPotion); }) as HealingPotion);
-                    }
+                    }                    
+                    game.update(update);
                 }
-                catch (Exception)
-                {
-                    Console.WriteLine("invalid input");
-                }
-                
+                catch (Exception) { }
                 Console.Clear();
-                game.update(update);
             }
         }
     }
