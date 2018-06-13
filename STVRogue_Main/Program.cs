@@ -11,12 +11,52 @@ namespace STVRogue
     {
         static void Main(string[] args)
         {
-            Game game = new Game(5, 4, 20);
-            game.player.location = new Node("a dummy node");
+            Game game = new Game(5, 4, 50);
+            
+            game.player.location = game.dungeon.startNode;
             while (true)
             {
-                Console.ReadKey();
-                game.update(new Command());
+                
+                
+                Node location = game.player.location;
+                Console.WriteLine("PlayerHp: " + game.player.HP);
+                Console.WriteLine("Current location: " + location.id);
+                Console.WriteLine("Bag contains:");
+                Console.WriteLine(game.player.bag.Count(a => a.GetType() == typeof(HealingPotion)) + " healing potions");
+                Console.WriteLine(game.player.bag.Count(a => a.GetType() == typeof(Crystal)) + " crystals");
+                Console.WriteLine("Available commands:");
+                for (int i = 0; i < location.neighbors.Count; i++)
+                    Console.WriteLine((i + 1) + ": move to " + location.neighbors[i].id);
+
+                
+
+                if(game.player.bag.Exists(a => a.GetType() == typeof(HealingPotion)) )
+                {
+                    Console.WriteLine("h: use healing potion");
+                }
+
+                Console.WriteLine("d: do nothing");
+                char key = Console.ReadKey().KeyChar;
+                Command update = new Command();
+                try
+                {
+                    int input = 0;
+                    if( int.TryParse(key.ToString(), out input))
+                    {
+                        update = new MoveCommand(location.neighbors[input - 1]);
+                    }
+                    if(key == 'h')
+                    {
+                        update = new UseHealingPotionCommand(game.player.bag.First( (a) => { return a.GetType() == typeof(HealingPotion); }) as HealingPotion);
+                    }
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("invalid input");
+                }
+                
+                Console.Clear();
+                game.update(update);
             }
         }
     }

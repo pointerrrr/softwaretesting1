@@ -17,7 +17,7 @@ namespace UnitTests_STVRogue
         public void MSTest_update()
         {
             Game game = new Game(2, 2, 6);
-            Assert.IsTrue(game.update(new Command()));
+            Assert.IsTrue(game.update(new NoActionCommand()));
         }
 
         [TestMethod]

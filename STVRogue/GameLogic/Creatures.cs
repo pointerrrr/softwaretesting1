@@ -87,5 +87,19 @@ namespace STVRogue.GameLogic
             if (foe_.pack.members.Count == 0)
                 foe_.pack.location.packs.Remove(foe_.pack);
         }
+
+        public bool Move(Node node)
+        {
+            if (location.neighbors.Contains(node))
+            {
+                location = node;
+                if (location.items.Count > 0)
+                    foreach (Item item in location.items)
+                        bag.Add(item);
+                location.items.Clear();
+                return true;
+            }
+            return false;
+        }
     }
 }
