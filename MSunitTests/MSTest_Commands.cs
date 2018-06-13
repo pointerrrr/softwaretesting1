@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using STVRogue;
 
 namespace UnitTests_STVRogue
 {
@@ -8,14 +9,14 @@ namespace UnitTests_STVRogue
         [TestMethod]
         public void MSTest_constructor()
         {
-            STVRogue.Command cmd = new STVRogue.NoActionCommand();
+            Command cmd = new Command();
             Assert.IsNotNull(cmd);
         }
 
         [TestMethod]
         public void MSTest_cmd_to_string()
         {
-            STVRogue.Command cmd = new STVRogue.NoActionCommand();
+            Command cmd = new Command();
             Assert.AreEqual("no-action", cmd.ToString());
         }
 

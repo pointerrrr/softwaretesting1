@@ -28,6 +28,11 @@ namespace STVRogue
                     break;
                 }
 
+                if(game.player.location.contested(game.player))
+                {
+                    game.player.location.combat(game.player);
+                }
+
                 
                 Node location = game.player.location;
                 Console.WriteLine("PlayerHp: " + game.player.HP + "/" + game.player.HPbase);

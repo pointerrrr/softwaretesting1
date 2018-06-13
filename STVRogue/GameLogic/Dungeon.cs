@@ -374,7 +374,7 @@ namespace STVRogue.GameLogic
                         char key = Console.ReadKey().KeyChar;
                         try
                         {
-                            player.move(neighbors[int.Parse(key.ToString()) - 1]);
+                            player.Move(neighbors[int.Parse(key.ToString()) - 1]);
                         }
                         catch { Console.WriteLine("Invalid input. Try again!"); continue; }
                         break;
@@ -390,7 +390,7 @@ namespace STVRogue.GameLogic
             }
         }
 
-        private bool contested(Player player)
+        public bool contested(Player player)
         {
             return packs.Count > 0 && player.location == this && player.HP > 0;
         }
