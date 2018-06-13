@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using STVRogue.Utils;
 
 namespace STVRogue.GameLogic
@@ -26,15 +27,17 @@ namespace STVRogue.GameLogic
             M = nodeCapacityMultiplier;
             this.numberOfMonsters = numberOfMonsters;
 
-            Node start = new Node("start");            
+            Node start = new Node("start");
+            start.zoneId = 0;
             Node exit = new Node("exit");
+            exit.zoneId = (int)level + 1;
             Bridge[] bridges = new Bridge[level];
             
             for(int i = 0; i <= level; i++)
             {
                 if(i < level)
                 {
-                    bridges[i] = new Bridge((i+1).ToString());
+                    bridges[i] = new Bridge(i+1, 0, 0);
                 }
 
                 generateZone(i + 1, i == 0 ? start : bridges[i-1], i == level ? exit : bridges[i]);
@@ -317,7 +320,7 @@ namespace STVRogue.GameLogic
          */
         public void combat(Player player)
         {
-            while(player.HP > 0 && packs.Count > 0)
+            while(contested(player))
             {
                 Console.WriteLine("i: use item");
                 Console.WriteLine("f: flee");
@@ -338,45 +341,87 @@ namespace STVRogue.GameLogic
                         Console.WriteLine("c: Crystal (" + crystals + " left)");
                         ConsoleKey item = Console.ReadKey().Key;
 
-                        //TODO: Start pack attacks after item use
                         if (item == ConsoleKey.H && healingPots > 0)
                         {
-                            foreach (Item hpot in player.bag)
-                                if (hpot.GetType() == typeof(HealingPotion))
-                                {
-                                    player.use(hpot);
-                                    Console.WriteLine("Used a healing potion. New HP: " + player.HP);
-                                    break;
-                                }
+                            HealingPotion hPot = (HealingPotion)player.bag.First(content => content.GetType() == typeof(HealingPotion));
+                            player.use(hPot);
+                            Console.WriteLine("Used a healing potion. New HP: " + player.HP);
+                            player.Attack(packs[0].members[0]);
+                            if (contested(player))
+                                monsterCombatTurn(player);
+                            break;
                         }
                         else if (item == ConsoleKey.C && crystals > 0)
                         {
-                            foreach (Item crystal in player.bag)
-                                if (crystal.GetType() == typeof(Crystal))
-                                {
-                                    player.use(crystal);
-                                    Console.WriteLine("Used a crystal. You are now accelerated.");
-                                    break;
-                                }
+                            Crystal crystal = (Crystal)player.bag.First(content => content.GetType() == typeof(Crystal));
+                            player.use(crystal);
+                            Console.WriteLine("Used a crystal. You are now accelerated.");
+                            player.Attack(packs[0].members[0]);
+                            if (contested(player))
+                                monsterCombatTurn(player);
+                            break;
                         }
                         else
                         {
-                            Console.WriteLine("Invalid command. Try again!");
+                            Console.WriteLine("Invalid input. Try again!");
                             continue;
                         }
-
-                        break;
-                    case ConsoleKey.C:
-                        break;
                     case ConsoleKey.F:
+                        Console.WriteLine("Choose where to flee to:");
+                        for (int i = 0; i < neighbors.Count; i++)
+                            Console.WriteLine((i + 1) + ": move to " + neighbors[i].id);
+
+                        char key = Console.ReadKey().KeyChar;
+                        try
+                        {
+                            player.move(neighbors[int.Parse(key.ToString()) - 1]);
+                        }
+                        catch { Console.WriteLine("Invalid input. Try again!"); continue; }
                         break;
                     case ConsoleKey.A:
+                        player.Attack(packs[0].members[0]);
+                        if (contested(player))
+                            monsterCombatTurn(player);
                         break;
                     default:
                         Console.WriteLine("Unknown Command. Try again!");
                         continue;
                 }
             }
+        }
+
+        private bool contested(Player player)
+        {
+            return packs.Count > 0 && player.location == this && player.HP > 0;
+        }
+
+        private void monsterCombatTurn(Player player)
+        {
+            Random rnd = RandomGenerator.rnd;
+            Pack pack1 = packs[0];
+            Pack pack2 = null;
+
+            int packHealth = 0;
+            foreach (Monster monster in pack1.members)
+                packHealth += monster.HP;
+
+            double fleeProbability = (1 - packHealth / pack1.startingHP) / 2;
+            if (rnd.NextDouble() < fleeProbability)
+            {
+                if (packs.Count > 1)
+                    pack2 = packs[1];
+
+                pack1.move(neighbors.First(neighbor => neighbor.zoneId == zoneId));  // Might need to try extra options when node is full
+                if (contested(player))
+                {
+                    if (pack2 != null)
+                        pack2.Attack(player);
+                    else
+                        pack1.Attack(player);
+                }
+            }
+            else
+                pack1.Attack(player);
         }
     }
 
@@ -385,6 +430,7 @@ namespace STVRogue.GameLogic
         public List<Node> fromNodes = new List<Node>();
         public List<Node> toNodes = new List<Node>();
         public Bridge(String id) : base(id) { }
+        public Bridge(int zoneId, int pathId, int nodeId) : base(zoneId, pathId, nodeId) { }
 
         /* Use this to connect the bridge to a node from the same zone. */
         public void connectToNodeOfSameZone(Node nd)
