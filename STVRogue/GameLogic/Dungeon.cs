@@ -322,6 +322,9 @@ namespace STVRogue.GameLogic
         {
             while(contested(player))
             {
+                int healingPots = player.bag.Count(a => a.GetType() == typeof(HealingPotion));
+                int crystals = player.bag.Count(a => a.GetType() == typeof(Crystal));
+                bool showItems = healingPots > 0 || crystals > 0;
                 int monsters = 0;
                 foreach (Pack pack in packs)
                     monsters += pack.members.Count;
@@ -332,14 +335,22 @@ namespace STVRogue.GameLogic
                 Console.WriteLine("Current location: " + id);
                 Console.WriteLine("Zone level: " + zoneId);
                 Console.WriteLine("Packs: " + packs.Count);
-                Console.WriteLine("Monsters: " + monsters);
+                Console.WriteLine();
+                Console.WriteLine("-------------------------------------------");
+                foreach(Pack pack in packs)
+                {
+                    Console.WriteLine("-- Pack '" + pack.id + "' (" + pack.members.Count + " monsters)");
+                    foreach (Monster monster in pack.members)
+                        Console.WriteLine("---- Monster '" + monster.id + "' | HP: " + monster.HP);
+                }
+                Console.WriteLine("-------------------------------------------");
                 Console.WriteLine();
                 Console.WriteLine("Bag contains:");
-                Console.WriteLine(player.bag.Count(a => a.GetType() == typeof(HealingPotion)) + " Healing potions");
-                Console.WriteLine(player.bag.Count(a => a.GetType() == typeof(Crystal)) + " Crystals");
+                Console.WriteLine(healingPots + " Healing potions");
+                Console.WriteLine(crystals + " Crystals");
                 Console.WriteLine();
                 Console.WriteLine("Possible commands:");
-                Console.WriteLine("i: use item");
+                if(showItems) Console.WriteLine("i: use item");
                 Console.WriteLine("f: flee");
                 Console.WriteLine("a: attack");
                 ConsoleKey action = Console.ReadKey().Key;
@@ -347,44 +358,41 @@ namespace STVRogue.GameLogic
 
                 switch (action) {
                     case ConsoleKey.I:
-                        Console.WriteLine("Bag contents:");
-                        int healingPots = 0;
-                        int crystals = 0;
-                        for(int i = 0; i < player.bag.Count; i++)
+                        if (showItems)
                         {
-                            if (player.bag[i].GetType() == typeof(HealingPotion)) healingPots++;
-                            else crystals++;
-                        }
-                        Console.WriteLine("h: Healing Potion (" + healingPots + " left)");
-                        Console.WriteLine("c: Crystal (" + crystals + " left)");
-                        ConsoleKey item = Console.ReadKey().Key;
+                            Console.WriteLine("Bag contents:");
+                            Console.WriteLine("h: Healing Potion (" + healingPots + " left)");
+                            Console.WriteLine("c: Crystal (" + crystals + " left)");
+                            ConsoleKey item = Console.ReadKey().Key;
 
-                        if (item == ConsoleKey.H && healingPots > 0)
-                        {
-                            HealingPotion hPot = (HealingPotion)player.bag.First(content => content.GetType() == typeof(HealingPotion));
-                            player.use(hPot);
-                            Console.WriteLine("Used a healing potion. New HP: " + player.HP);
-                            player.Attack(packs[0].members[0]);
-                            if (contested(player))
-                                monsterCombatTurn(player);
-                            break;
+                            if (item == ConsoleKey.H && healingPots > 0)
+                            {
+                                HealingPotion hPot = (HealingPotion)player.bag.First(content => content.GetType() == typeof(HealingPotion));
+                                player.use(hPot);
+                                Console.WriteLine("Used a healing potion. New HP: " + player.HP);
+                                player.Attack(packs[0].members[0]);
+                                if (contested(player))
+                                    monsterCombatTurn(player);
+                                break;
+                            }
+                            else if (item == ConsoleKey.C && crystals > 0)
+                            {
+                                Crystal crystal = (Crystal)player.bag.First(content => content.GetType() == typeof(Crystal));
+                                player.use(crystal);
+                                Console.WriteLine("Used a crystal. You are now accelerated.");
+                                player.Attack(packs[0].members[0]);
+                                if (contested(player))
+                                    monsterCombatTurn(player);
+                                break;
+                            }
+                            else
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Invalid input. Try again!");
+                                continue;
+                            }
                         }
-                        else if (item == ConsoleKey.C && crystals > 0)
-                        {
-                            Crystal crystal = (Crystal)player.bag.First(content => content.GetType() == typeof(Crystal));
-                            player.use(crystal);
-                            Console.WriteLine("Used a crystal. You are now accelerated.");
-                            player.Attack(packs[0].members[0]);
-                            if (contested(player))
-                                monsterCombatTurn(player);
-                            break;
-                        }
-                        else
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Invalid input. Try again!");
-                            continue;
-                        }
+                        else { continue; }
                     case ConsoleKey.F:
                         Console.WriteLine("Choose where to flee to:");
                         for (int i = 0; i < neighbors.Count; i++)
