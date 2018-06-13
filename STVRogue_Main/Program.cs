@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using STVRogue.GameLogic;
+using STVRogue.Utils;
 namespace STVRogue
 {
     /* A dummy top-level program to run the STVRogue game */
@@ -11,6 +12,7 @@ namespace STVRogue
     {
         static void Main(string[] args)
         {
+            RandomGenerator.initializeWithSeed(1337);
             Game game = new Game(5, 4, 50);
             
             game.player.location = game.dungeon.startNode;

@@ -1,5 +1,6 @@
 ﻿using System;
 using STVRogue.Utils;
+using System.Collections.Generic;
 
 namespace STVRogue.GameLogic
 {
@@ -7,6 +8,8 @@ namespace STVRogue.GameLogic
     {
         public Player player;
         public Dungeon dungeon;
+        Random rnd;
+        Predicates pred = new Predicates();
 
         /* This creates a player and a random dungeon of the given difficulty level and node-capacity
          * The player is positioned at the dungeon's starting-node.
@@ -17,6 +20,7 @@ namespace STVRogue.GameLogic
          */
         public Game(uint difficultyLevel, uint nodeCapcityMultiplier, uint numberOfMonsters)
         {
+            rnd = RandomGenerator.rnd;
             Logger.log("Creating a game of difficulty level " + difficultyLevel + ", node capacity multiplier "
                        + nodeCapcityMultiplier + ", and " + numberOfMonsters + " monsters.");
             player = new Player();
@@ -48,10 +52,43 @@ namespace STVRogue.GameLogic
                 default:
                     return false;
             }
-
+            updateMonsters();
             return true;
         }
+
+        private void updateMonsters()
+        {
+            List<Node> allNodes = new List<Node>();
+            allNodes = pred.reachableNodes(dungeon.startNode);
+            List<Pack> allPacks = new List<Pack>();
+            foreach(Node node in allNodes)
+            {
+                foreach (Pack pack in node.packs)
+                    allPacks.Add(pack);
+            }
+            foreach(Pack pack in allPacks)
+            {
+                if (pack.location == player.location)
+                    continue;
+                if (player.location.zoneId == dungeon.difficultyLevel + 1 && pack.location.zoneId == dungeon.difficultyLevel + 1)
+                {
+                    pack.moveTowards(player.location);                    
+                }
+                else
+                {
+                    bool move = rnd.Next(0, 2) == 0;
+                    if (move)
+                    {
+                        int target = rnd.Next(0, pack.location.neighbors.Count);
+                        pack.move(pack.location.neighbors[target]);
+                    }
+                }
+            }
+        }        
     }
+
+
+    
 
     public class GameCreationException : Exception
     {

@@ -20,7 +20,6 @@ namespace STVRogue.GameLogic
         /* To create a new dungeon with the specified difficult level and capacity multiplier */
         public Dungeon(uint level, uint nodeCapacityMultiplier, uint numberOfMonsters)
         {
-            RandomGenerator.initializeWithSeed(1337);
             random = RandomGenerator.rnd;
             Logger.log("Creating a dungeon of difficulty level " + level + ", node capacity multiplier " + nodeCapacityMultiplier + ".");
             difficultyLevel = level;
@@ -429,6 +428,7 @@ namespace STVRogue.GameLogic
     {
         public List<Node> fromNodes = new List<Node>();
         public List<Node> toNodes = new List<Node>();
+
         public Bridge(String id) : base(id) { }
         public Bridge(int zoneId, int pathId, int nodeId) : base(zoneId, pathId, nodeId) { }
 

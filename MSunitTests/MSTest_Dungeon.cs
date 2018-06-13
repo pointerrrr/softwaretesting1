@@ -254,7 +254,7 @@ namespace STVRogue.GameLogic
         public void MSTest_fight_exception_thrown()
         {
             Node test = new Node();
-            test.fight(new Player());
+            test.combat(new Player());
         }
 
         [TestMethod]
