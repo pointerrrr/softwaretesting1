@@ -68,4 +68,12 @@ namespace STVRogue
             return "move-to";
         }
     }
+
+    public class ExitCommand : Command
+    {
+        public override string ToString()
+        {
+            return "exit";
+        }
+    }
 }

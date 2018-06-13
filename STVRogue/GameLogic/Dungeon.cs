@@ -280,6 +280,31 @@ namespace STVRogue.GameLogic
             else
                 return 0;
         }
+
+        public static Command updateCommand(Game game, ConsoleKey key)
+        {
+            Command update = new Command();
+            Node location = game.player.location;
+            try
+            {
+                int input = 0;
+                if (key == ConsoleKey.Escape)
+                {
+                    ReplayWriter.CloseWriter();
+                    return new ExitCommand();
+                }
+                if (int.TryParse(key.ToString().Last().ToString(), out input))
+                {
+                    update = new MoveCommand(location.neighbors[input - 1]);
+                }
+                if (key == ConsoleKey.H)
+                {
+                    update = new UseHealingPotionCommand(game.player.bag.First((a) => { return a.GetType() == typeof(HealingPotion); }) as HealingPotion);
+                }
+                return update;
+            }
+            catch { return null; }
+        }
     }
 
     public class Node
@@ -339,7 +364,7 @@ namespace STVRogue.GameLogic
                 Console.WriteLine("-------------------------------------------");
                 foreach(Pack pack in packs)
                 {
-                    Console.WriteLine("-- Pack '" + pack.id + "' (" + pack.members.Count + " monsters)");
+                    Console.WriteLine("-- Pack '" + pack.id + "' (" + pack.members.Count + (pack.members.Count == 1 ? " monster)" : " monsters)"));
                     foreach (Monster monster in pack.members)
                         Console.WriteLine("---- Monster '" + monster.id + "' | HP: " + monster.HP);
                 }
@@ -355,73 +380,133 @@ namespace STVRogue.GameLogic
                 Console.WriteLine("a: attack");
                 Console.WriteLine("esc: exit");
                 ConsoleKey action = Console.ReadKey().Key;
+                ReplayWriter.RecordKey(action);
+
+                updateFightState(player, action);
+
                 Console.Clear();
+            }
+        }
 
-                switch (action) {
-                    case ConsoleKey.I:
-                        if (showItems)
-                        {
-                            Console.WriteLine("Bag contents:");
+        public void updateFightState(Player player, ConsoleKey action)
+        {
+            int healingPots = player.bag.Count(a => a.GetType() == typeof(HealingPotion));
+            int crystals = player.bag.Count(a => a.GetType() == typeof(Crystal));
+            bool showItems = healingPots > 0 || crystals > 0;
+            switch (action)
+            {
+                case ConsoleKey.I:
+                    if (showItems)
+                    {
+                        Console.WriteLine("Bag contents:");
+                        if (healingPots > 0)
                             Console.WriteLine("h: Healing Potion (" + healingPots + " left)");
+                        if (crystals > 0)
                             Console.WriteLine("c: Crystal (" + crystals + " left)");
-                            Console.WriteLine("b: back");
-                            ConsoleKey item = Console.ReadKey().Key;
-
-                            if (item == ConsoleKey.H && healingPots > 0)
-                            {
-                                HealingPotion hPot = (HealingPotion)player.bag.First(content => content.GetType() == typeof(HealingPotion));
-                                player.use(hPot);
-                                Console.WriteLine("Used a healing potion. New HP: " + player.HP);
-                                player.Attack(packs[0].members[0]);
-                                if (contested(player))
-                                    monsterCombatTurn(player);
-                                break;
-                            }
-                            else if (item == ConsoleKey.C && crystals > 0)
-                            {
-                                Crystal crystal = (Crystal)player.bag.First(content => content.GetType() == typeof(Crystal));
-                                player.use(crystal);
-                                Console.WriteLine("Used a crystal. You are now accelerated.");
-                                player.Attack(packs[0].members[0]);
-                                if (contested(player))
-                                    monsterCombatTurn(player);
-                                break;
-                            }
-                            else if (item == ConsoleKey.B)
-                                continue;
-                            else
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Invalid input. Try again!");
-                                continue;
-                            }
-                        }
-                        else { continue; }
-                    case ConsoleKey.F:
-                        Console.WriteLine("Choose where to flee to:");
-                        for (int i = 0; i < neighbors.Count; i++)
-                            Console.WriteLine((i + 1) + ": move to " + neighbors[i].id);
-
-                        char key = Console.ReadKey().KeyChar;
-                        try
+                        Console.WriteLine("b: back");
+                        ConsoleKey item = Console.ReadKey().Key;
+                        ReplayWriter.RecordKey(item);
+                        if (item == ConsoleKey.H && healingPots > 0)
                         {
-                            Console.Clear();
-                            player.Move(neighbors[int.Parse(key.ToString()) - 1]);
+                            HealingPotion hPot = (HealingPotion)player.bag.First(content => content.GetType() == typeof(HealingPotion));
+                            player.use(hPot);
+                            Console.WriteLine("Used a healing potion. New HP: " + player.HP);
+                            player.Attack(packs[0].members[0]);
+                            if (contested(player))
+                                monsterCombatTurn(player);
+                            return;
                         }
-                        catch { Console.Clear(); Console.WriteLine("Invalid input. Try again!"); continue; }
-                        break;
-                    case ConsoleKey.A:
-                        player.Attack(packs[0].members[0]);
-                        if (contested(player))
-                            monsterCombatTurn(player);
-                        break;
-                    case ConsoleKey.Escape:
-                        Environment.Exit(0);
-                        break;
-                    default:
-                        Console.WriteLine("Unknown Command. Try again!");
-                        continue;
-                }
+                        else if (item == ConsoleKey.C && crystals > 0)
+                        {
+                            Crystal crystal = (Crystal)player.bag.First(content => content.GetType() == typeof(Crystal));
+                            player.use(crystal);
+                            Console.WriteLine("Used a crystal. You are now accelerated.");
+                            player.Attack(packs[0].members[0]);
+                            if (contested(player))
+                                monsterCombatTurn(player);
+                            return;
+                        }
+                        else
+                            return;
+                    }
+                    else { return; }
+                case ConsoleKey.F:
+                    Console.WriteLine("Choose where to flee to:");
+                    for (int i = 0; i < neighbors.Count; i++)
+                        Console.WriteLine((i + 1) + ": move to " + neighbors[i].id);
+
+                    ConsoleKeyInfo info = Console.ReadKey();
+                    char key = info.KeyChar;
+                    ReplayWriter.RecordKey(info.Key);
+                    try
+                    {
+                        Console.Clear();
+                        player.Move(neighbors[int.Parse(key.ToString()) - 1]);
+                    }
+                    catch { Console.Clear(); Console.WriteLine("Invalid input. Try again!"); return; }
+                    break;
+                case ConsoleKey.A:
+                    player.Attack(packs[0].members[0]);
+                    if (contested(player))
+                        monsterCombatTurn(player);
+                    break;
+                case ConsoleKey.Escape:
+                    ReplayWriter.CloseWriter();
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Unknown Command. Try again!");
+                    return;
+            }
+        }
+
+        public void updateFightWithItem(Player player, ConsoleKey Action1, ConsoleKey Action2)
+        {
+            int healingPots = player.bag.Count(a => a.GetType() == typeof(HealingPotion));
+            int crystals = player.bag.Count(a => a.GetType() == typeof(Crystal));
+            bool showItems = healingPots > 0 || crystals > 0;
+            switch (Action1)
+            {
+                case ConsoleKey.I:
+                    if (showItems)
+                    {
+
+                        ConsoleKey item = Action2;
+                        ReplayWriter.RecordKey(item);
+                        if (item == ConsoleKey.H && healingPots > 0)
+                        {
+                            HealingPotion hPot = (HealingPotion)player.bag.First(content => content.GetType() == typeof(HealingPotion));
+                            player.use(hPot);
+                            Console.WriteLine("** Used a healing potion. New HP: " + player.HP);
+                            player.Attack(packs[0].members[0]);
+                            if (contested(player))
+                                monsterCombatTurn(player);
+                            return;
+                        }
+                        else if (item == ConsoleKey.C && crystals > 0)
+                        {
+                            Crystal crystal = (Crystal)player.bag.First(content => content.GetType() == typeof(Crystal));
+                            player.use(crystal);
+                            Console.WriteLine("** Used a crystal. You are now accelerated.");
+                            player.Attack(packs[0].members[0]);
+                            if (contested(player))
+                                monsterCombatTurn(player);
+                            return;
+                        }
+                        else
+                            return;
+                    }
+                    else { return; }
+                case ConsoleKey.F:
+                    char key = Action2.ToString().Last();
+                    ReplayWriter.RecordKey(Action2);
+                    try
+                    {
+                        Console.Clear();
+                        player.Move(neighbors[int.Parse(key.ToString()) - 1]);
+                    }
+                    catch { Console.Clear(); Console.WriteLine("Invalid input. Try again!"); return; }
+                    break;
             }
         }
 
