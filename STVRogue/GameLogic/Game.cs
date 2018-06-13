@@ -69,7 +69,7 @@ namespace STVRogue.GameLogic
             }
             foreach(Pack pack in allPacks)
             {
-                if (pack.location == player.location)
+                if (!pack.location.contested(player))
                     continue;
                 if((pack.location.zoneId == player.location.zoneId && player.location.contested(player)) ||
                     player.location.zoneId == dungeon.difficultyLevel + 1 && pack.location.zoneId == dungeon.difficultyLevel + 1)

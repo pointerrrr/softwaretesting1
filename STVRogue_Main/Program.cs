@@ -10,10 +10,11 @@ namespace STVRogue
     /* A dummy top-level program to run the STVRogue game */
     class Program
     {
+        static Game game;
         static void Main(string[] args)
         {
             RandomGenerator.initializeWithSeed(1337);
-            Game game = new Game(5, 4, 50);
+            game = new Game(5, 4, 50);
 
             Console.WriteLine("Press a button to start");
             Console.ReadKey();
@@ -54,26 +55,50 @@ namespace STVRogue
                 Console.WriteLine("d: do nothing");
                 Console.WriteLine("esc: exit");
                 ConsoleKey key = Console.ReadKey().Key;
-                Command update = new Command();
+                Command update = null;
                 try
                 {
-                    if (key == ConsoleKey.Escape)
-                        return;
+                    
                     int input = 0;
                     string b = key.ToString();
-                    if( int.TryParse(key.ToString().Last().ToString(), out input))
+                    if (key == ConsoleKey.Escape)
+                        return;
+                    if ( int.TryParse(key.ToString().Last().ToString(), out input))
                     {
                         update = new MoveCommand(location.neighbors[input - 1]);
                     }
                     if(key == ConsoleKey.H)
                     {
                         update = new UseHealingPotionCommand(game.player.bag.First( (a) => { return a.GetType() == typeof(HealingPotion); }) as HealingPotion);
-                    }                    
-                    game.update(update);
+                    }
+                    if(update != null)
+                        game.update(update);
                 }
                 catch (Exception) { }
                 Console.Clear();
             }
+        }
+
+        void updateCommand(ConsoleKey key)
+        {
+            Command update = new Command();
+            try
+            {
+                if (key == ConsoleKey.Escape)
+                    return;
+                int input = 0;
+                string b = key.ToString();
+                if (int.TryParse(key.ToString().Last().ToString(), out input))
+                {
+                    update = new MoveCommand(game.player.location.neighbors[input - 1]);
+                }
+                if (key == ConsoleKey.H)
+                {
+                    update = new UseHealingPotionCommand(game.player.bag.First((a) => { return a.GetType() == typeof(HealingPotion); }) as HealingPotion);
+                }
+                game.update(update);
+            }
+            catch { }
         }
     }
 }

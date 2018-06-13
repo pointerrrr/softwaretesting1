@@ -353,6 +353,7 @@ namespace STVRogue.GameLogic
                 if(showItems) Console.WriteLine("i: use item");
                 Console.WriteLine("f: flee");
                 Console.WriteLine("a: attack");
+                Console.WriteLine("esc: exit");
                 ConsoleKey action = Console.ReadKey().Key;
                 Console.Clear();
 
@@ -363,6 +364,7 @@ namespace STVRogue.GameLogic
                             Console.WriteLine("Bag contents:");
                             Console.WriteLine("h: Healing Potion (" + healingPots + " left)");
                             Console.WriteLine("c: Crystal (" + crystals + " left)");
+                            Console.WriteLine("b: back");
                             ConsoleKey item = Console.ReadKey().Key;
 
                             if (item == ConsoleKey.H && healingPots > 0)
@@ -385,6 +387,8 @@ namespace STVRogue.GameLogic
                                     monsterCombatTurn(player);
                                 break;
                             }
+                            else if (item == ConsoleKey.B)
+                                continue;
                             else
                             {
                                 Console.Clear();
@@ -410,6 +414,9 @@ namespace STVRogue.GameLogic
                         player.Attack(packs[0].members[0]);
                         if (contested(player))
                             monsterCombatTurn(player);
+                        break;
+                    case ConsoleKey.Escape:
+                        Environment.Exit(0);
                         break;
                     default:
                         Console.WriteLine("Unknown Command. Try again!");
