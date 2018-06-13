@@ -30,7 +30,7 @@ namespace STVRogue
 
         public UseCrystalCommand(Crystal crystal)
         {
-            this.crystal = crystal
+            this.crystal = crystal;
         }
 
         public override string ToString()
