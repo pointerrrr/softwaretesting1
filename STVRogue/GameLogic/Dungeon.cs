@@ -121,6 +121,7 @@ namespace STVRogue.GameLogic
                     {
                         Pack pack = new Pack(temp.id + " " + monsterCount, 0);
                         pack.AddMonster(monster);
+                        pack.dungeon = this;
                         pack.location = temp;
                         temp.packs.Add(pack);
                     }
@@ -450,19 +451,23 @@ namespace STVRogue.GameLogic
         public List<Node> toNodes = new List<Node>();
 
         public Bridge(String id) : base(id) { }
-        public Bridge(int zoneId, int pathId, int nodeId) : base(zoneId, pathId, nodeId) { }
+        public Bridge(int zoneId, int pathId, int nodeId)
+        {
+            this.zoneId = zoneId; this.pathId = pathId; this.nodeId = nodeId;
+            id = (zoneId + 1) + "." + pathId + "." + nodeId;
+        }
 
         /* Use this to connect the bridge to a node from the same zone. */
         public void connectToNodeOfSameZone(Node nd)
         {
-            base.connect(nd);
+            connect(nd);
             fromNodes.Add(nd);
         }
 
         /* Use this to connect the bridge to a node from the next zone. */
         public void connectToNodeOfNextZone(Node nd)
         {
-            base.connect(nd);
+            connect(nd);
             toNodes.Add(nd);
         }
     }

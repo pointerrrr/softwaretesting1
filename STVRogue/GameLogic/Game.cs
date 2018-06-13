@@ -25,6 +25,7 @@ namespace STVRogue.GameLogic
                        + nodeCapcityMultiplier + ", and " + numberOfMonsters + " monsters.");
             player = new Player();
             dungeon = new Dungeon(difficultyLevel, nodeCapcityMultiplier, numberOfMonsters);
+            player.location = dungeon.startNode;
             player.HP =  (int) Math.Max(1, Math.Min(100, dungeon.totalMonsterHP * 0.79));
         }
 
@@ -70,9 +71,10 @@ namespace STVRogue.GameLogic
             {
                 if (pack.location == player.location)
                     continue;
-                if (player.location.zoneId == dungeon.difficultyLevel + 1 && pack.location.zoneId == dungeon.difficultyLevel + 1)
+                if((pack.location.zoneId == player.location.zoneId && player.location.contested(player)) ||
+                    player.location.zoneId == dungeon.difficultyLevel + 1 && pack.location.zoneId == dungeon.difficultyLevel + 1)
                 {
-                    pack.moveTowards(player.location);                    
+                    pack.moveTowards(player.location);
                 }
                 else
                 {

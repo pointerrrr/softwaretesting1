@@ -14,8 +14,6 @@ namespace STVRogue
         {
             RandomGenerator.initializeWithSeed(1337);
             Game game = new Game(5, 4, 50);
-            
-            game.player.location = game.dungeon.startNode;
 
             Console.WriteLine("Press a button to start");
             Console.ReadKey();
