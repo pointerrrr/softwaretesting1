@@ -12,19 +12,26 @@ namespace STVRogue.GameLogic
     [TestClass]
     public class MSTest_GameRules
     {
-        [TestMethod]
-        public void MSTest_RZone()
+        List<ReplayReader> replays = new List<ReplayReader>();
+        string[] files = new string[] { "/default.txt", "/test.txt" };
+
+        public void InitReplays()
         {
-            ReplayReader reader = new ReplayReader(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/default.txt");
-            Assert.IsTrue(reader.replay(new Always(RZone)));
-            Assert.IsTrue(reader.replay(new Always(RNode)));
-            Assert.IsTrue(reader.replay(new Unless(NotContested, MovedTowards)));
-            Assert.IsTrue(reader.replay(new Unless(NotInLastZone, ForcedMove)));
-            reader = new ReplayReader(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/test.txt");
-            Assert.IsTrue(reader.replay(new Always(RZone)));
-            Assert.IsTrue(reader.replay(new Always(RNode)));
-            Assert.IsTrue(reader.replay(new Unless(NotContested, MovedTowards)));
-            Assert.IsTrue(reader.replay(new Unless(NotInLastZone, ForcedMove)));
+            foreach (string file in files)
+                replays.Add(new ReplayReader(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + file));
+        }
+
+        [TestMethod]
+        public void Test_GameRules()
+        {
+            InitReplays();
+            foreach (ReplayReader reader in replays)
+            {
+                Assert.IsTrue(reader.replay(new Always(RZone)));
+                Assert.IsTrue(reader.replay(new Always(RNode)));
+                Assert.IsTrue(reader.replay(new Unless(NotContested, MovedTowards)));
+                Assert.IsTrue(reader.replay(new Unless(NotInLastZone, ForcedMove)));
+            }
         }
 
         static bool RZone(Game game)
