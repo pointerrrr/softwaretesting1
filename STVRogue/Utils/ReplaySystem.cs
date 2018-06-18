@@ -75,13 +75,13 @@ namespace STVRogue.Utils
             catch { throw new InvalidDataException(); }
         }
 
-        public bool replay(Specification S)
+        public bool replay(Specification spec)
         {
             reset();
             while (true)
             {
                 // test if the specification holds on the current state:
-                bool ok = S.test(getState());
+                bool ok = spec.Test(getState());
                 if (ok)
                 {
                     // if the specification holds, move to the next turn (if there is a next turn):
@@ -133,18 +133,41 @@ namespace STVRogue.Utils
         }
     }
 
-    public class Specification
+    public abstract class Specification
+    {
+        public abstract bool Test(Game gameState);
+    }
+
+    public class Always : Specification
     {
         private Predicate<Game> predicate;
-
-        public Specification(Predicate<Game> p)
+        public Always (Predicate<Game> p)
         {
             predicate = p;
         }
 
-        public bool test(Game gameState)
+        public override bool Test(Game gameState)
         {
             return predicate(gameState);
         }
+    }
+
+    public class Unless : Specification
+    {
+        public bool history = true;
+
+        public Predicate<Game> always;
+        public Predicate<Game> unless;
+
+        public Unless(Predicate<Game> p, Predicate<Game> q)
+        {
+            always = p;
+            unless = q;
+        }
+
+        public override bool Test(Game gameState)
+        {
+            return history = !history || (history && (always(gameState) || unless(gameState)));
+        }            
     }
 }

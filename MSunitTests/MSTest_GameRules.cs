@@ -16,7 +16,7 @@ namespace STVRogue.GameLogic
         public void MSTest_RZone()
         {
             ReplayReader reader = new ReplayReader(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/default.txt");
-            Assert.IsTrue(reader.replay(new Specification(RZone)));
+            Assert.IsTrue(reader.replay(new Always(RZone)));
         }
 
         static bool RZone(Game game)
