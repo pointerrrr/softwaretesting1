@@ -10,6 +10,12 @@ namespace STVRogue.GameLogic
         public List<Monster> members = new List<Monster>();
         public int startingHP = 0;
         public Node location;
+        // previous location and reason of move, reasons:
+        // 0: moved
+        // 1: cannot move because of capacity
+        // 2: not fleeing
+        // 3: tried to move out of zone
+        public KeyValuePair<Node,int> previousLocation;
         public Dungeon dungeon;
 
         public Pack(String id, uint n)
@@ -42,9 +48,11 @@ namespace STVRogue.GameLogic
         /* Move the pack to an adjacent node. */
         public void move(Node u)
         {
+            
             if (u.zoneId != location.zoneId)
             {
                 Logger.log("Pack " + id + " is trying to move out of their zone. Rejected.");
+                previousLocation = new KeyValuePair<Node, int>(location,3);
                 return;
             }
             if (!location.neighbors.Contains(u)) throw new ArgumentException();
@@ -57,8 +65,10 @@ namespace STVRogue.GameLogic
             if (members.Count > capacity)
             {
                 Logger.log("Pack " + id + " is trying to move to a full node " + u.id + ", but this would cause the node to exceed its capacity. Rejected.");
+                previousLocation = new KeyValuePair<Node, int>(location, 1);
                 return;
             }
+            previousLocation = new KeyValuePair<Node, int>(location, 0);
             location = u;
             u.packs.Add(this);
             Logger.log("Pack " + id + " moves to an already full node " + u.id + ". Rejected.");

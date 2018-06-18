@@ -303,7 +303,10 @@ namespace STVRogue.GameLogic
                 }
                 return update;
             }
-            catch { return null; }
+            catch (Exception e)
+            {
+                return update;
+            }
         }
     }
 
@@ -382,18 +385,19 @@ namespace STVRogue.GameLogic
                 ConsoleKey action = Console.ReadKey().Key;
                 ReplayWriter.RecordKey(action);
 
-                updateFightState(player, action);
+                updateFightState(player, action, ConsoleKey.NoName);
 
                 Console.Clear();
             }
         }
 
-        public void updateFightState(Player player, ConsoleKey action)
+        public void updateFightState(Player player, ConsoleKey action1, ConsoleKey action2)
         {
+            
             int healingPots = player.bag.Count(a => a.GetType() == typeof(HealingPotion));
             int crystals = player.bag.Count(a => a.GetType() == typeof(Crystal));
             bool showItems = healingPots > 0 || crystals > 0;
-            switch (action)
+            switch (action1)
             {
                 case ConsoleKey.I:
                     if (showItems)
@@ -404,9 +408,13 @@ namespace STVRogue.GameLogic
                         if (crystals > 0)
                             Console.WriteLine("c: Crystal (" + crystals + " left)");
                         Console.WriteLine("b: back");
-                        ConsoleKey item = Console.ReadKey().Key;
-                        ReplayWriter.RecordKey(item);
-                        if (item == ConsoleKey.H && healingPots > 0)
+                        ConsoleKey item1;
+                        if (action2 == ConsoleKey.NoName)
+                            item1 = Console.ReadKey().Key;
+                        else
+                            item1 = action2;
+                        ReplayWriter.RecordKey(item1);
+                        if (item1 == ConsoleKey.H && healingPots > 0)
                         {
                             HealingPotion hPot = (HealingPotion)player.bag.First(content => content.GetType() == typeof(HealingPotion));
                             player.use(hPot);
@@ -416,7 +424,7 @@ namespace STVRogue.GameLogic
                                 monsterCombatTurn(player);
                             return;
                         }
-                        else if (item == ConsoleKey.C && crystals > 0)
+                        else if (item1 == ConsoleKey.C && crystals > 0)
                         {
                             Crystal crystal = (Crystal)player.bag.First(content => content.GetType() == typeof(Crystal));
                             player.use(crystal);
@@ -435,9 +443,13 @@ namespace STVRogue.GameLogic
                     for (int i = 0; i < neighbors.Count; i++)
                         Console.WriteLine((i + 1) + ": move to " + neighbors[i].id);
 
-                    ConsoleKeyInfo info = Console.ReadKey();
-                    char key = info.KeyChar;
-                    ReplayWriter.RecordKey(info.Key);
+                    ConsoleKey item2;
+                    if (action2 == ConsoleKey.NoName)
+                        item2 = Console.ReadKey().Key;
+                    else
+                        item2 = action2;
+                    ReplayWriter.RecordKey(item2);
+                    char key = item2.ToString().Last();
                     try
                     {
                         Console.Clear();
@@ -457,56 +469,6 @@ namespace STVRogue.GameLogic
                 default:
                     Console.WriteLine("Unknown Command. Try again!");
                     return;
-            }
-        }
-
-        public void updateFightWithItem(Player player, ConsoleKey Action1, ConsoleKey Action2)
-        {
-            int healingPots = player.bag.Count(a => a.GetType() == typeof(HealingPotion));
-            int crystals = player.bag.Count(a => a.GetType() == typeof(Crystal));
-            bool showItems = healingPots > 0 || crystals > 0;
-            switch (Action1)
-            {
-                case ConsoleKey.I:
-                    if (showItems)
-                    {
-
-                        ConsoleKey item = Action2;
-                        ReplayWriter.RecordKey(item);
-                        if (item == ConsoleKey.H && healingPots > 0)
-                        {
-                            HealingPotion hPot = (HealingPotion)player.bag.First(content => content.GetType() == typeof(HealingPotion));
-                            player.use(hPot);
-                            Console.WriteLine("** Used a healing potion. New HP: " + player.HP);
-                            player.Attack(packs[0].members[0]);
-                            if (contested(player))
-                                monsterCombatTurn(player);
-                            return;
-                        }
-                        else if (item == ConsoleKey.C && crystals > 0)
-                        {
-                            Crystal crystal = (Crystal)player.bag.First(content => content.GetType() == typeof(Crystal));
-                            player.use(crystal);
-                            Console.WriteLine("** Used a crystal. You are now accelerated.");
-                            player.Attack(packs[0].members[0]);
-                            if (contested(player))
-                                monsterCombatTurn(player);
-                            return;
-                        }
-                        else
-                            return;
-                    }
-                    else { return; }
-                case ConsoleKey.F:
-                    char key = Action2.ToString().Last();
-                    ReplayWriter.RecordKey(Action2);
-                    try
-                    {
-                        Console.Clear();
-                        player.Move(neighbors[int.Parse(key.ToString()) - 1]);
-                    }
-                    catch { Console.Clear(); Console.WriteLine("Invalid input. Try again!"); return; }
-                    break;
             }
         }
 
@@ -531,7 +493,7 @@ namespace STVRogue.GameLogic
                 if (packs.Count > 1)
                     pack2 = packs[1];
 
-                pack1.move(neighbors.First(neighbor => neighbor.zoneId == zoneId));  // Might need to try extra options when node is full
+                pack1.move(neighbors.First(neighbor => neighbor.zoneId == zoneId));// Might need to try extra options when node is full
                 if (contested(player))
                 {
                     if (pack2 != null)
@@ -541,7 +503,10 @@ namespace STVRogue.GameLogic
                 }
             }
             else
+            {
                 pack1.Attack(player);
+                pack1.previousLocation = new KeyValuePair<Node,int>(pack1.location, 2);
+            }
         }
     }
 

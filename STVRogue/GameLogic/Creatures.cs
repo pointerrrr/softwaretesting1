@@ -39,6 +39,7 @@ namespace STVRogue.GameLogic
         public Boolean accelerated = false;
         public uint KillPoint = 0;
         public List<Item> bag = new List<Item>();
+        public Node previousLocation;
         public Player()
         {
             //this.dungeon = dungeon;
@@ -90,6 +91,7 @@ namespace STVRogue.GameLogic
 
         public bool Move(Node node)
         {
+            previousLocation = location;
             if (location.neighbors.Contains(node))
             {
                 location = node;

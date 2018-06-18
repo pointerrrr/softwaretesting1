@@ -16,7 +16,8 @@ namespace STVRogue.Utils
         {
             try
             {
-
+                if (writer != null)
+                    writer.Close();
                 writer = new StreamWriter(GetFolderPath(SpecialFolder.MyDocuments) + "/" + name + ".txt");
                 writer.WriteLine(seed);
                 writer.WriteLine(difficultyLevel + "," + nodeCapacityMultiplier + "," + numberOfMonsters);
@@ -71,8 +72,9 @@ namespace STVRogue.Utils
                     if(Enum.TryParse(key, out result))
                         commands.Add(result);
                 }
+                reader.Close();
             }
-            catch { throw new InvalidDataException(); }
+            catch(Exception e) { throw new InvalidDataException(); }
         }
 
         public bool replay(Specification spec)
@@ -104,9 +106,9 @@ namespace STVRogue.Utils
             {
                 
                 if(commands[currentTurn] == ConsoleKey.I || commands[currentTurn] == ConsoleKey.F)
-                    gameState.player.location.updateFightWithItem(gameState.player, commands[currentTurn++], commands[currentTurn++]);
+                    gameState.player.location.updateFightState(gameState.player, commands[currentTurn++], commands[currentTurn++]);
                 else
-                    gameState.player.location.updateFightState(gameState.player, commands[currentTurn++]);
+                    gameState.player.location.updateFightState(gameState.player, commands[currentTurn++], ConsoleKey.NoName);
             }
             else
             {
@@ -167,6 +169,10 @@ namespace STVRogue.Utils
 
         public override bool Test(Game gameState)
         {
+            bool a = always(gameState);
+            bool b = unless(gameState);
+            if (!(!history || (history && (always(gameState) || unless(gameState)))))
+                ;
             return history = !history || (history && (always(gameState) || unless(gameState)));
         }            
     }

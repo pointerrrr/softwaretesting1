@@ -84,6 +84,8 @@ namespace STVRogue.GameLogic
                         int target = rnd.Next(0, pack.location.neighbors.Count);
                         pack.move(pack.location.neighbors[target]);
                     }
+                    else
+                        pack.previousLocation = new KeyValuePair<Node, int>(pack.location, 2);
                 }
             }
         }        

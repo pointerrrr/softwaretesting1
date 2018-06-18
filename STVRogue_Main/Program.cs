@@ -14,14 +14,14 @@ namespace STVRogue
         static Game game;
         static void Main(string[] args)
         {
-            int seed = 1337;
+            int seed = 1234;
             RandomGenerator.initializeWithSeed(seed);
             uint difficultyLevel = 5;
             uint nodeCapacityMultiplier = 4;
             uint numberOfMonsters = 50;
             game = new Game(difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
 
-            ReplayWriter.InitializeReplaySystem("default", seed, difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
+            ReplayWriter.InitializeReplaySystem("replay2", seed, difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
 
 
             Console.WriteLine("Press a button to start");
