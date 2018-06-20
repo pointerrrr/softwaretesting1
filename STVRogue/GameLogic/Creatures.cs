@@ -91,7 +91,6 @@ namespace STVRogue.GameLogic
 
         public bool Move(Node node)
         {
-            previousLocation = location;
             if (location.neighbors.Contains(node))
             {
                 location = node;

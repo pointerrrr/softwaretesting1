@@ -223,7 +223,8 @@ namespace STVRogue.GameLogic
             List<Node> result = new List<Node>();
             Queue<Node> queue = new Queue<Node>();
             Dictionary<Node, Node> passed = new Dictionary<Node, Node>();
-
+            if (u == v)
+                return new List<Node>();
             // BFS using a queue
             bool found = false;
             queue.Enqueue(u);
@@ -308,6 +309,18 @@ namespace STVRogue.GameLogic
                 return update;
             }
         }
+
+        public void updateLocations(Player player)
+        {
+            Predicates pred = new Predicates();
+            player.previousLocation = player.location;
+            List<Node> allNodes = pred.reachableNodes(startNode);
+            List<Pack> allPacks = new List<Pack>();
+            foreach (Node node in allNodes)
+                allPacks.AddRange(node.packs);
+            foreach (Pack pack in allPacks)
+                pack.previousLocation = new KeyValuePair<Node, int>(pack.location, 4);
+        }
     }
 
     public class Node
@@ -350,38 +363,7 @@ namespace STVRogue.GameLogic
         {
             while(contested(player))
             {
-                int healingPots = player.bag.Count(a => a.GetType() == typeof(HealingPotion));
-                int crystals = player.bag.Count(a => a.GetType() == typeof(Crystal));
-                bool showItems = healingPots > 0 || crystals > 0;
-                int monsters = 0;
-                foreach (Pack pack in packs)
-                    monsters += pack.members.Count;
-
-                Console.Clear();
-                Console.WriteLine("** Node is contested!");
-                Console.WriteLine("Player HP: " + player.HP + "/" + player.HPbase);
-                Console.WriteLine("Current location: " + id);
-                Console.WriteLine("Zone level: " + zoneId);
-                Console.WriteLine("Packs: " + packs.Count);
-                Console.WriteLine();
-                Console.WriteLine("-------------------------------------------");
-                foreach(Pack pack in packs)
-                {
-                    Console.WriteLine("-- Pack '" + pack.id + "' (" + pack.members.Count + (pack.members.Count == 1 ? " monster)" : " monsters)"));
-                    foreach (Monster monster in pack.members)
-                        Console.WriteLine("---- Monster '" + monster.id + "' | HP: " + monster.HP);
-                }
-                Console.WriteLine("-------------------------------------------");
-                Console.WriteLine();
-                Console.WriteLine("Bag contains:");
-                Console.WriteLine(healingPots + " Healing potions");
-                Console.WriteLine(crystals + " Crystals");
-                Console.WriteLine();
-                Console.WriteLine("Possible commands:");
-                if(showItems) Console.WriteLine("i: use item");
-                Console.WriteLine("f: flee");
-                Console.WriteLine("a: attack");
-                Console.WriteLine("esc: exit");
+                showGameText(player);
                 ConsoleKey action = Console.ReadKey().Key;
                 ReplayWriter.RecordKey(action);
 
@@ -391,9 +373,45 @@ namespace STVRogue.GameLogic
             }
         }
 
+        public void showGameText(Player player)
+        {
+            int healingPots = player.bag.Count(a => a.GetType() == typeof(HealingPotion));
+            int crystals = player.bag.Count(a => a.GetType() == typeof(Crystal));
+            bool showItems = healingPots > 0 || crystals > 0;
+            int monsters = 0;
+            foreach (Pack pack in packs)
+                monsters += pack.members.Count;
+
+            Console.Clear();
+            Console.WriteLine("** Node is contested!");
+            Console.WriteLine("Player HP: " + player.HP + "/" + player.HPbase);
+            Console.WriteLine("Current location: " + id);
+            Console.WriteLine("Zone level: " + zoneId);
+            Console.WriteLine("Packs: " + packs.Count);
+            Console.WriteLine();
+            Console.WriteLine("-------------------------------------------");
+            foreach (Pack pack in packs)
+            {
+                Console.WriteLine("-- Pack '" + pack.id + "' (" + pack.members.Count + (pack.members.Count == 1 ? " monster)" : " monsters)"));
+                foreach (Monster monster in pack.members)
+                    Console.WriteLine("---- Monster '" + monster.id + "' | HP: " + monster.HP);
+            }
+            Console.WriteLine("-------------------------------------------");
+            Console.WriteLine();
+            Console.WriteLine("Bag contains:");
+            Console.WriteLine(healingPots + " Healing potions");
+            Console.WriteLine(crystals + " Crystals");
+            Console.WriteLine();
+            Console.WriteLine("Possible commands:");
+            if (showItems) Console.WriteLine("i: use item");
+            Console.WriteLine("f: flee");
+            Console.WriteLine("a: attack");
+            Console.WriteLine("esc: exit");
+        }
+
         public void updateFightState(Player player, ConsoleKey action1, ConsoleKey action2)
         {
-            
+            player.dungeon.updateLocations(player);
             int healingPots = player.bag.Count(a => a.GetType() == typeof(HealingPotion));
             int crystals = player.bag.Count(a => a.GetType() == typeof(Crystal));
             bool showItems = healingPots > 0 || crystals > 0;
@@ -492,8 +510,9 @@ namespace STVRogue.GameLogic
             {
                 if (packs.Count > 1)
                     pack2 = packs[1];
-
+                pack1.previousLocation = new KeyValuePair<Node, int>(pack1.location,4);
                 pack1.move(neighbors.First(neighbor => neighbor.zoneId == zoneId));// Might need to try extra options when node is full
+                
                 if (contested(player))
                 {
                     if (pack2 != null)

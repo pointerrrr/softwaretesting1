@@ -26,6 +26,7 @@ namespace STVRogue.GameLogic
             player = new Player();
             dungeon = new Dungeon(difficultyLevel, nodeCapcityMultiplier, numberOfMonsters);
             player.location = dungeon.startNode;
+            player.dungeon = dungeon;
             player.HP =  (int) Math.Max(1, Math.Min(100, dungeon.totalMonsterHP * 0.79));
         }
 
@@ -39,8 +40,10 @@ namespace STVRogue.GameLogic
             switch(userCommand.ToString())
             {
                 case "no-action":
+                    dungeon.updateLocations(player);
                     break;
                 case "use-potion":
+                    dungeon.updateLocations(player);
                     UseHealingPotionCommand usecommand = userCommand as UseHealingPotionCommand;
                     usecommand.potion.use(player);
                     player.bag.Remove(usecommand.potion);
@@ -49,6 +52,7 @@ namespace STVRogue.GameLogic
                     MoveCommand movecommand = userCommand as MoveCommand;
                     if (!player.Move(movecommand.node))
                         return false;
+                    dungeon.updateLocations(player);
                     break;
                 default:
                     return false;
@@ -71,8 +75,8 @@ namespace STVRogue.GameLogic
             {
                 if (pack.location == player.location)
                     continue;
-                if((pack.location.zoneId == player.location.zoneId && player.location.contested(player)) ||
-                    player.location.zoneId == dungeon.difficultyLevel + 1 && pack.location.zoneId == dungeon.difficultyLevel + 1)
+                if((( player.location.contested(player)) || (player.location.zoneId == dungeon.difficultyLevel + 1 ))
+                    && pack.location != player.location && pack.location.zoneId == player.location.zoneId)
                 {
                     pack.moveTowards(player.location);
                 }

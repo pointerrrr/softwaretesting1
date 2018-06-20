@@ -15,6 +15,7 @@ namespace STVRogue.GameLogic
         // 1: cannot move because of capacity
         // 2: not fleeing
         // 3: tried to move out of zone
+        // 4: no move
         public KeyValuePair<Node,int> previousLocation;
         public Dungeon dungeon;
 
@@ -69,10 +70,9 @@ namespace STVRogue.GameLogic
                 return;
             }
             previousLocation = new KeyValuePair<Node, int>(location, 0);
+            location.packs.Remove(this);
             location = u;
             u.packs.Add(this);
-            Logger.log("Pack " + id + " moves to an already full node " + u.id + ". Rejected.");
-
         }
 
         /* Move the pack one node further along a shortest path to u. */

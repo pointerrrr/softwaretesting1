@@ -10,8 +10,6 @@ namespace STVRogue.Utils
     {
         static StreamWriter writer;
 
-        private static Game currenState;
-
         public static void InitializeReplaySystem(string name, int seed, uint difficultyLevel, uint nodeCapacityMultiplier, uint numberOfMonsters)
         {
             try
@@ -112,6 +110,7 @@ namespace STVRogue.Utils
             }
             else
             {
+                gameState.player.location.showGameText(gameState.player);
                 Command updateCommand = Dungeon.updateCommand(gameState, commands[currentTurn++]);
                 gameState.update(updateCommand);
             }

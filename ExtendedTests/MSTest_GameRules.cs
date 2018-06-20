@@ -18,7 +18,7 @@ namespace STVRogue.GameLogic
         public void InitReplays()
         {
             foreach (string file in files)
-                replays.Add(new ReplayReader(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + file));
+                replays.Add(new ReplayReader(Environment.CurrentDirectory + "../../replays/" + file));
         }
 
         [TestMethod]
@@ -71,10 +71,11 @@ namespace STVRogue.GameLogic
                 foreach (Pack pack in node.packs)
                     if (pack.location.zoneId == game.player.location.zoneId)
                     {
-                        if (pack.previousLocation.Key != null && pack.previousLocation.Key != pack.location)
+                        if (pack.previousLocation.Key != null && pack.previousLocation.Key != pack.location && game.player.location != pack.previousLocation.Key)
                         {
-                            List<Node> path = game.dungeon.shortestpath(pack.previousLocation.Key, game.player.location);
-                            if (path.First() != pack.location && pack.previousLocation.Key != game.player.location)
+                            List<Node> path1 = game.dungeon.shortestpath(pack.previousLocation.Key, game.player.location);
+                            List<Node> path2 = game.dungeon.shortestpath(pack.location, game.player.location);
+                            if (path1.Count <= path2.Count)
                                 return false;
                         }
                     }
@@ -83,7 +84,15 @@ namespace STVRogue.GameLogic
 
         static bool NotContested(Game game)
         {
-            return !game.player.location.contested(game.player);
+            Predicates pred = new Predicates();
+            List<Node> allNodes = pred.reachableNodes(game.dungeon.startNode);
+            List<Pack> allPacks = new List<Pack>();
+            foreach (Node node in allNodes)
+                allPacks.AddRange(node.packs);
+            foreach (Pack pack in allPacks)
+                if (pack.previousLocation.Key == pack.location && pack.location == game.player.location)
+                    return false;
+            return true;
         }
 
 
@@ -102,7 +111,7 @@ namespace STVRogue.GameLogic
                     {
                         if (pack.previousLocation.Key != null && pack.previousLocation.Key != pack.location)
                         {
-                            List<Node> path = game.dungeon.shortestpath(pack.previousLocation.Key, game.player.location);
+                            List<Node> path = game.dungeon.shortestpath(pack.previousLocation.Key, game.player.previousLocation);
                             if (path.First() != pack.location && pack.previousLocation.Key != game.player.location)
                                 return false;
                         }
