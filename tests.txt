@@ -3,3 +3,7 @@ niet/wel einde bereiken
 wel/niet aanvallen
 wel/niet doodgaan
 wel/niet kills krijgen
+
+wel combat | niet einde (door doodgaan) | wel aanvallen | wel kills | wel doodgaan | meerdere zones
+niet combat | wel einde | niet aanvallen | niet kills | niet doodgaan | meerdere zones
+niet combat | niet einde (door esc-knop) | niet aanvallen | niet kills | niet doodgaan | 1 zone
