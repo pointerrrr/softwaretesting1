@@ -1,0 +1,5 @@
+wel combat tegenkomen/geen combat tegenkomen
+niet/wel einde bereiken
+wel/niet aanvallen
+wel/niet doodgaan
+wel/niet kills krijgen
