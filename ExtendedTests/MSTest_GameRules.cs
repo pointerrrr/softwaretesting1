@@ -13,12 +13,12 @@ namespace STVRogue.GameLogic
     public class MSTest_GameRules
     {
         List<ReplayReader> replays = new List<ReplayReader>();
-        string[] files = new string[] { "/default.txt", "/test.txt" };
+        string[] files = new string[] { "NOCombat_EscGame.txt", "NOCombat_ReachEnd.txt", "Combat_Kill_Die_UseItems.txt" };
 
         public void InitReplays()
         {
             foreach (string file in files)
-                replays.Add(new ReplayReader(Environment.CurrentDirectory + "../../replays/" + file));
+                replays.Add(new ReplayReader(Environment.CurrentDirectory + "../../../../replays/" + file));
         }
 
         [TestMethod]

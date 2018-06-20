@@ -54,6 +54,9 @@ namespace STVRogue.GameLogic
                         return false;
                     dungeon.updateLocations(player);
                     break;
+                case "exit":
+                    Environment.Exit(0);
+                    break;
                 default:
                     return false;
             }
