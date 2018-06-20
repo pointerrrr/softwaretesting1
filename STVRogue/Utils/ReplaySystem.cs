@@ -16,12 +16,12 @@ namespace STVRogue.Utils
             {
                 if (writer != null)
                     writer.Close();
-                writer = new StreamWriter(GetFolderPath(SpecialFolder.MyDocuments) + "/" + name + ".txt");
+                writer = new StreamWriter(CurrentDirectory + "../../replays/" + name + ".txt");
                 writer.WriteLine(seed);
                 writer.WriteLine(difficultyLevel + "," + nodeCapacityMultiplier + "," + numberOfMonsters);
             }
             catch {
-                writer = new StreamWriter(GetFolderPath(SpecialFolder.MyDocuments) + "/" + "backup" + ".txt");
+                writer = new StreamWriter(CurrentDirectory + "../../replays/failsafe/" + name + ".txt");
                 writer.WriteLine(seed);
                 writer.WriteLine(difficultyLevel + "," + nodeCapacityMultiplier + "," + numberOfMonsters);
             }
