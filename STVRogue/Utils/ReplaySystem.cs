@@ -104,7 +104,7 @@ namespace STVRogue.Utils
 
         private void replayTurn()
         {
-            if (gameState.player.location.contested(gameState.player))
+            if (NotContested(gameState) && gameState.player.location.contested(gameState.player))
             {
                 gameState.player.location.showGameText(gameState.player);
                 if (commands[currentTurn] == ConsoleKey.I || commands[currentTurn] == ConsoleKey.F)
@@ -117,6 +117,19 @@ namespace STVRogue.Utils
                 Command updateCommand = Dungeon.updateCommand(gameState, commands[currentTurn++]);
                 gameState.update(updateCommand);
             }
+        }
+
+        static bool NotContested(Game game)
+        {
+            Predicates pred = new Predicates();
+            List<Node> allNodes = pred.reachableNodes(game.dungeon.startNode);
+            List<Pack> allPacks = new List<Pack>();
+            foreach (Node node in allNodes)
+                allPacks.AddRange(node.packs);
+            foreach (Pack pack in allPacks)
+                if (pack.previousLocation.Key == pack.location && pack.location == game.player.location)
+                    return false;
+            return true;
         }
 
         private void reset()

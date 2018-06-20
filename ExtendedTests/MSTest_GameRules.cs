@@ -25,6 +25,7 @@ namespace STVRogue.GameLogic
         public void Test_GameRules()
         {
             InitReplays();
+            Assert.IsFalse(replays[1].replay(new Always(a => a.player.location != a.dungeon.exitNode)));
             foreach (ReplayReader reader in replays)
             {
                 Assert.IsTrue(reader.replay(new Always(RZone)));
