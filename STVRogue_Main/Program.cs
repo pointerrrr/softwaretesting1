@@ -16,9 +16,9 @@ namespace STVRogue
         {
             int seed = 1234;
             RandomGenerator.initializeWithSeed(seed);
-            uint difficultyLevel = 5;
-            uint nodeCapacityMultiplier = 4;
-            uint numberOfMonsters = 50;
+            uint difficultyLevel = 6;
+            uint nodeCapacityMultiplier = 100;
+            uint numberOfMonsters = 1000;
             game = new Game(difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
 
             ReplayWriter.InitializeReplaySystem("replay2", seed, difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
@@ -37,18 +37,19 @@ namespace STVRogue
                     Console.ReadKey();
                     break;
                 }
-                else
-                if(game.player.HP <= 0)
-                {
-                    Console.WriteLine("You LOST!");
-                    ReplayWriter.CloseWriter();
-                    Console.ReadKey();
-                    break;
-                }
 
                 if (game.player.location.contested(game.player))
                 {
                     game.player.location.combat(game.player);
+                }
+
+                if (game.player.HP <= 0)
+                {
+                    Console.Clear();
+                    Console.WriteLine("You LOST!");
+                    ReplayWriter.CloseWriter();
+                    Console.ReadKey();
+                    break;
                 }
 
 
@@ -77,7 +78,6 @@ namespace STVRogue
                 try
                 {
                     update = Dungeon.updateCommand(game, key);
-
                     if (update != null)
                         game.update(update);
                 }
