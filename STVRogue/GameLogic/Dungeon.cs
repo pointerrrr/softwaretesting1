@@ -506,7 +506,8 @@ namespace STVRogue.GameLogic
                 if (packs.Count > 1)
                     pack2 = packs[1];
                 pack1.previousLocation = new KeyValuePair<Node, int>(pack1.location,4);
-                pack1.move(neighbors.First(neighbor => neighbor.zoneId == zoneId));// Might need to try extra options when node is full
+                if(neighbors.Exists(a => a.zoneId == zoneId))
+                    pack1.move(neighbors.First(neighbor => neighbor.zoneId == zoneId));// Might need to try extra options when node is full
                 
                 if (contested(player))
                 {

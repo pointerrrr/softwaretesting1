@@ -66,7 +66,7 @@ namespace STVRogue.Utils
                 nodeCapacityMultiplier = uint.Parse(values[1]);
                 numberOfMonsters = uint.Parse(values[2]);
                 commands = new List<ConsoleKey>();
-                ReplayWriter.InitializeReplaySystem(Path.GetFileNameWithoutExtension(path), seed, difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
+                ReplayWriter.InitializeReplaySystem("replayer", seed, difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
                 string[] res = reader.ReadToEnd().Split(',');
                 foreach (string key in res)
                 {
@@ -171,10 +171,6 @@ namespace STVRogue.Utils
 
         public override bool Test(Game gameState)
         {
-            bool a = always(gameState);
-            bool b = unless(gameState);
-            if (!(!history || (history && (always(gameState) || unless(gameState)))))
-                ;
             return history = !history || (history && (always(gameState) || unless(gameState)));
         }            
     }

@@ -73,7 +73,7 @@ namespace STVRogue.GameLogic
                     {
                         if (pack.previousLocation.Key != null && pack.previousLocation.Key != pack.location && game.player.previousLocation != pack.previousLocation.Key)
                         {
-                            List<Node> path1 = game.dungeon.shortestpath(pack.previousLocation.Key, game.player.location);
+                            List<Node> path1 = game.dungeon.shortestpath(pack.previousLocation.Key, game.player.previousLocation);
                             List<Node> path2 = game.dungeon.shortestpath(pack.location, game.player.location);
                             if (path1.Count <= path2.Count)
                                 return false;

@@ -49,7 +49,8 @@ namespace STVRogue.GameLogic
         /* Move the pack to an adjacent node. */
         public void move(Node u)
         {
-            
+            if (u == null)
+                return;
             if (u.zoneId != location.zoneId)
             {
                 Logger.log("Pack " + id + " is trying to move out of their zone. Rejected.");

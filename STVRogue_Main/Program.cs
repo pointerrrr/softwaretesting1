@@ -14,14 +14,14 @@ namespace STVRogue
         static Game game;
         static void Main(string[] args)
         {
-            int seed = 5349832;
+            int seed = 951742;
             RandomGenerator.initializeWithSeed(seed);
-            uint difficultyLevel = 6;
+            uint difficultyLevel = 1;
             uint nodeCapacityMultiplier = 100;
-            uint numberOfMonsters = 1000;
+            uint numberOfMonsters = 200;
             game = new Game(difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
 
-            ReplayWriter.InitializeReplaySystem("Combat_Kill_Die_UseItems", seed, difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
+            ReplayWriter.InitializeReplaySystem("NOCombat_ReachEnd", seed, difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
 
             Console.WriteLine("Press a button to start");
             Console.ReadKey();
@@ -29,17 +29,19 @@ namespace STVRogue
 
             while (true)
             {
+                
+
+                if (game.player.location.contested(game.player))
+                {
+                    game.player.location.combat(game.player);
+                }
+
                 if (game.player.location == game.dungeon.exitNode)
                 {
                     Console.WriteLine("You WON!");
                     ReplayWriter.CloseWriter();
                     Console.ReadKey();
                     break;
-                }
-
-                if (game.player.location.contested(game.player))
-                {
-                    game.player.location.combat(game.player);
                 }
 
                 if (game.player.HP <= 0)
