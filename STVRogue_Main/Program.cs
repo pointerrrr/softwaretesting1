@@ -37,6 +37,14 @@ namespace STVRogue
                     Console.ReadKey();
                     break;
                 }
+                else
+                if(game.player.HP <= 0)
+                {
+                    Console.WriteLine("You LOST!");
+                    ReplayWriter.CloseWriter();
+                    Console.ReadKey();
+                    break;
+                }
 
                 if (game.player.location.contested(game.player))
                 {
