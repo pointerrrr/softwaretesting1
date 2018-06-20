@@ -74,6 +74,12 @@ namespace STVRogue
                 Console.WriteLine("esc: exit");
                 ConsoleKey key = Console.ReadKey().Key;
                 ReplayWriter.RecordKey(key);
+                if (key == ConsoleKey.Escape)
+                {
+                    Console.Clear();
+                    ReplayWriter.CloseWriter();
+                    break;
+                }
                 Command update = null;
                 try
                 {

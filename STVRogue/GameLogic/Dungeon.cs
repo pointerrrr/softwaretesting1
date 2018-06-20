@@ -406,7 +406,6 @@ namespace STVRogue.GameLogic
             if (showItems) Console.WriteLine("i: use item");
             Console.WriteLine("f: flee");
             Console.WriteLine("a: attack");
-            Console.WriteLine("esc: exit");
         }
 
         public void updateFightState(Player player, ConsoleKey action1, ConsoleKey action2)
@@ -480,10 +479,6 @@ namespace STVRogue.GameLogic
                     if (contested(player))
                         monsterCombatTurn(player);
                     break;
-                case ConsoleKey.Escape:
-                    ReplayWriter.CloseWriter();
-                    Environment.Exit(0);
-                    break;
                 default:
                     Console.WriteLine("Unknown Command. Try again!");
                     return;
@@ -505,7 +500,7 @@ namespace STVRogue.GameLogic
             foreach (Monster monster in pack1.members)
                 packHealth += monster.HP;
 
-            double fleeProbability = (1 - packHealth / pack1.startingHP) / 2;
+            double fleeProbability = (1 - packHealth / (double)pack1.startingHP) / 2;
             if (rnd.NextDouble() < fleeProbability)
             {
                 if (packs.Count > 1)

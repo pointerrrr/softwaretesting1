@@ -34,7 +34,11 @@ namespace STVRogue.Utils
 
         public static void RecordKey(ConsoleKey key)
         {
-            writer.Write(key.ToString() + ",");
+            try
+            {
+                writer.Write(key.ToString() + ",");
+            }
+            catch{}
         }
     }
 
@@ -102,15 +106,14 @@ namespace STVRogue.Utils
         {
             if (gameState.player.location.contested(gameState.player))
             {
-                
-                if(commands[currentTurn] == ConsoleKey.I || commands[currentTurn] == ConsoleKey.F)
+                gameState.player.location.showGameText(gameState.player);
+                if (commands[currentTurn] == ConsoleKey.I || commands[currentTurn] == ConsoleKey.F)
                     gameState.player.location.updateFightState(gameState.player, commands[currentTurn++], commands[currentTurn++]);
                 else
                     gameState.player.location.updateFightState(gameState.player, commands[currentTurn++], ConsoleKey.NoName);
             }
             else
             {
-                gameState.player.location.showGameText(gameState.player);
                 Command updateCommand = Dungeon.updateCommand(gameState, commands[currentTurn++]);
                 gameState.update(updateCommand);
             }

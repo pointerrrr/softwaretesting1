@@ -24,36 +24,6 @@ namespace STVRogue
         }
     }
 
-    public class UseCrystalCommand : Command
-    {
-        public Crystal crystal;
-
-        public UseCrystalCommand(Crystal crystal)
-        {
-            this.crystal = crystal;
-        }
-
-        public override string ToString()
-        {
-            return "use-crystal";
-        }
-    }
-
-    public class AttackCommand : Command
-    {
-        public Pack pack;
-
-        public AttackCommand(Pack pack)
-        {
-            this.pack = pack;
-        }
-
-        public override string ToString()
-        {
-            return "attack";
-        }
-    }
-
     public class MoveCommand : Command
     {
         public Node node;
