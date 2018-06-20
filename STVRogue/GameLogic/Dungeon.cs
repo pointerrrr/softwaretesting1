@@ -29,7 +29,7 @@ namespace STVRogue.GameLogic
             Node start = new Node("start");
             start.zoneId = 0;
             Node exit = new Node("exit");
-            exit.zoneId = (int)level + 1;
+            exit.zoneId = (int)level + 2;
             Bridge[] bridges = new Bridge[level];
             
             for(int i = 0; i <= level; i++)
@@ -319,7 +319,7 @@ namespace STVRogue.GameLogic
             foreach (Node node in allNodes)
                 allPacks.AddRange(node.packs);
             foreach (Pack pack in allPacks)
-                pack.previousLocation = new KeyValuePair<Node, int>(pack.location, 4);
+                pack.previousLocation = new KeyValuePair<Node, int>(pack.location, 3);
         }
     }
 
@@ -437,6 +437,7 @@ namespace STVRogue.GameLogic
                             player.use(hPot);
                             Console.WriteLine("Used a healing potion. New HP: " + player.HP);
                             player.Attack(packs[0].members[0]);
+                            player.game.updateMonsters();
                             if (contested(player))
                                 monsterCombatTurn(player);
                             return;
@@ -447,6 +448,7 @@ namespace STVRogue.GameLogic
                             player.use(crystal);
                             Console.WriteLine("Used a crystal. You are now accelerated.");
                             player.Attack(packs[0].members[0]);
+                            player.game.updateMonsters();
                             if (contested(player))
                                 monsterCombatTurn(player);
                             return;
@@ -470,12 +472,15 @@ namespace STVRogue.GameLogic
                     try
                     {
                         Console.Clear();
+                        
                         player.Move(neighbors[int.Parse(key.ToString()) - 1]);
+                        player.game.updateMonsters();
                     }
                     catch { Console.Clear(); Console.WriteLine("Invalid input. Try again!"); return; }
                     break;
                 case ConsoleKey.A:
                     player.Attack(packs[0].members[0]);
+                    player.game.updateMonsters();
                     if (contested(player))
                         monsterCombatTurn(player);
                     break;
@@ -505,7 +510,7 @@ namespace STVRogue.GameLogic
             {
                 if (packs.Count > 1)
                     pack2 = packs[1];
-                pack1.previousLocation = new KeyValuePair<Node, int>(pack1.location,4);
+                pack1.previousLocation = new KeyValuePair<Node, int>(pack1.location,1);
                 if(neighbors.Exists(a => a.zoneId == zoneId))
                     pack1.move(neighbors.First(neighbor => neighbor.zoneId == zoneId));// Might need to try extra options when node is full
                 

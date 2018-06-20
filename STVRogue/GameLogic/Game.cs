@@ -27,6 +27,7 @@ namespace STVRogue.GameLogic
             dungeon = new Dungeon(difficultyLevel, nodeCapcityMultiplier, numberOfMonsters);
             player.location = dungeon.startNode;
             player.dungeon = dungeon;
+            player.game = this;
             player.HP =  (int) Math.Max(1, Math.Min(100, dungeon.totalMonsterHP * 0.79));
         }
 
@@ -61,7 +62,7 @@ namespace STVRogue.GameLogic
             return true;
         }
 
-        private void updateMonsters()
+        public void updateMonsters()
         {
             List<Node> allNodes = new List<Node>();
             allNodes = pred.reachableNodes(dungeon.startNode);
@@ -74,7 +75,10 @@ namespace STVRogue.GameLogic
             foreach(Pack pack in allPacks)
             {
                 if (pack.location == player.location)
+                {
+                    pack.previousLocation = new KeyValuePair<Node, int>(pack.location, 1);
                     continue;
+                }
                 if((( player.location.contested(player)) || (player.location.zoneId == dungeon.difficultyLevel + 1 ))
                     && pack.location != player.location && pack.location.zoneId == player.location.zoneId)
                 {

@@ -33,6 +33,7 @@ namespace STVRogue.GameLogic
                 Assert.IsTrue(reader.replay(new Unless(NotContested, MovedTowards)));
                 Assert.IsTrue(reader.replay(new Unless(NotInLastZone, ForcedMove)));
             }
+            
         }
 
         static bool RZone(Game game)
@@ -108,20 +109,22 @@ namespace STVRogue.GameLogic
             List<Node> allNodes = pred.reachableNodes(game.dungeon.startNode);
             foreach (Node node in allNodes)
                 foreach (Pack pack in node.packs)
-                    if (pack.location.zoneId == game.player.location.zoneId)
+                {
+                    if (pack.location.zoneId == game.dungeon.difficultyLevel + 1 && pack.previousLocation.Key != game.player.previousLocation && pack.previousLocation.Key != null && pack.location.zoneId == game.player.location.zoneId)
                     {
-                        if (pack.previousLocation.Key != null && pack.previousLocation.Key != pack.location)
+                        
+                        if (pack.previousLocation.Key != pack.location && game.player.previousLocation != pack.previousLocation.Key)
                         {
-                            List<Node> path = game.dungeon.shortestpath(pack.previousLocation.Key, game.player.previousLocation);
-                            if (path.Count > 0)
-                                if (path.First() != pack.location && pack.previousLocation.Key != game.player.location)
-                                    return false;
+                            List<Node> path1 = game.dungeon.shortestpath(pack.previousLocation.Key, game.player.previousLocation);
+                            List<Node> path2 = game.dungeon.shortestpath(pack.location, game.player.location);
+                            if (path1.Count <= path2.Count)
+                                return false;
                         }
-                        else if(pack.previousLocation.Key != null && pack.previousLocation.Key == pack.location && pack.previousLocation.Value != 1 && pack.location != game.player.location)
-                        {
+                        else if (pack.previousLocation.Key == pack.location && pack.previousLocation.Value != 1)
                             return false;
-                        }
                     }
+                    
+                }
             return true;
         }
     }
