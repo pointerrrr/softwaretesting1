@@ -12,10 +12,9 @@ namespace STVRogue.GameLogic
         public Node location;
         // previous location and reason of move, reasons:
         // 0: moved
-        // 1: cannot move because of capacity
+        // 1: cannot move
         // 2: not fleeing
-        // 3: tried to move out of zone
-        // 4: no move
+        // 3: does not move
         public KeyValuePair<Node,int> previousLocation;
         public Dungeon dungeon;
 
@@ -50,11 +49,14 @@ namespace STVRogue.GameLogic
         public void move(Node u)
         {
             if (u == null)
+            {
+                previousLocation = new KeyValuePair<Node, int>(location, 1);
                 return;
+            }
             if (u.zoneId != location.zoneId)
             {
                 Logger.log("Pack " + id + " is trying to move out of their zone. Rejected.");
-                previousLocation = new KeyValuePair<Node, int>(location,3);
+                previousLocation = new KeyValuePair<Node, int>(location, 1);
                 return;
             }
             if (!location.neighbors.Contains(u)) throw new ArgumentException();
@@ -83,6 +85,10 @@ namespace STVRogue.GameLogic
             {
                 List<Node> path = dungeon.shortestpath(location, u);
                 move(path[0]);
+            }
+            else
+            {
+                previousLocation = new KeyValuePair<Node, int>(location, 1);
             }
         }
     }

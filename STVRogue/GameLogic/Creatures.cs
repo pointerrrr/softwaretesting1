@@ -40,6 +40,7 @@ namespace STVRogue.GameLogic
         public uint KillPoint = 0;
         public List<Item> bag = new List<Item>();
         public Node previousLocation;
+        public Game game;
         public Player()
         {
             //this.dungeon = dungeon;
