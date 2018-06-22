@@ -1,3 +1,3 @@
-999999
-2,3,15
-NumPad2,F,NumPad2,NumPad4,F,NumPad3,NumPad3,NumPad4,F,NumPad2,NumPad1,
+174545872
+1,3,8
+NumPad2,NumPad2,F,NumPad3,F,NumPad3,F,NumPad2,

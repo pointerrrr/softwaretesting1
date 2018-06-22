@@ -66,7 +66,7 @@ namespace STVRogue.Utils
                 nodeCapacityMultiplier = uint.Parse(values[1]);
                 numberOfMonsters = uint.Parse(values[2]);
                 commands = new List<ConsoleKey>();
-                ReplayWriter.InitializeReplaySystem("replayer", seed, difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
+                ReplayWriter.InitializeReplaySystem("asdfsadf", seed, difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
                 string[] res = reader.ReadToEnd().Split(',');
                 foreach (string key in res)
                 {
@@ -104,7 +104,7 @@ namespace STVRogue.Utils
 
         private void replayTurn()
         {
-            if (NotContested(gameState) && gameState.player.location.contested(gameState.player))
+            if (gameState.player.location.contested(gameState.player))
             {
                 gameState.player.location.showGameText(gameState.player);
                 if (commands[currentTurn] == ConsoleKey.I || commands[currentTurn] == ConsoleKey.F)

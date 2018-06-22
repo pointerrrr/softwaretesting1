@@ -14,14 +14,14 @@ namespace STVRogue
         static Game game;
         static void Main(string[] args)
         {
-            int seed = 6456329;
+            int seed = 174545872;
             RandomGenerator.initializeWithSeed(seed);
-            uint difficultyLevel = 6;
-            uint nodeCapacityMultiplier = 100;
-            uint numberOfMonsters = 1000;
+            uint difficultyLevel = 1;
+            uint nodeCapacityMultiplier = 3;
+            uint numberOfMonsters = 8;
             game = new Game(difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
 
-            ReplayWriter.InitializeReplaySystem("Combat_Kill_Die_UseItems", seed, difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
+            ReplayWriter.InitializeReplaySystem("blargh", seed, difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
 
             Console.WriteLine("Press a button to start");
             Console.ReadKey();
@@ -33,61 +33,64 @@ namespace STVRogue
                 {
                     game.player.location.combat(game.player);
                 }
-
-                if (game.player.location == game.dungeon.exitNode)
+                else
                 {
-                    Console.WriteLine("You WON!");
-                    ReplayWriter.CloseWriter();
-                    Console.ReadKey();
-                    break;
-                }
 
-                if (game.player.HP <= 0)
-                {
+                    if (game.player.location == game.dungeon.exitNode)
+                    {
+                        Console.WriteLine("You WON!");
+                        ReplayWriter.CloseWriter();
+                        Console.ReadKey();
+                        break;
+                    }
+
+                    if (game.player.HP <= 0)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("You LOST!");
+                        ReplayWriter.CloseWriter();
+                        Console.ReadKey();
+                        break;
+                    }
+
+
+                    Node location = game.player.location;
+                    Console.WriteLine("PlayerHp: " + game.player.HP + "/" + game.player.HPbase);
+                    Console.WriteLine("Current location: " + location.id);
+                    Console.WriteLine("Bag contains:");
+                    Console.WriteLine(game.player.bag.Count(a => a.GetType() == typeof(HealingPotion)) + " healing potions");
+                    Console.WriteLine(game.player.bag.Count(a => a.GetType() == typeof(Crystal)) + " crystals");
+                    Console.WriteLine("Available commands:");
+                    for (int i = 0; i < location.neighbors.Count; i++)
+                        Console.WriteLine((i + 1) + ": move to " + location.neighbors[i].id);
+
+
+
+                    if (game.player.bag.Exists(a => a.GetType() == typeof(HealingPotion)))
+                    {
+                        Console.WriteLine("h: use healing potion");
+                    }
+
+                    Console.WriteLine("d: do nothing");
+                    Console.WriteLine("esc: exit");
+                    ConsoleKey key = Console.ReadKey().Key;
+                    ReplayWriter.RecordKey(key);
+                    if (key == ConsoleKey.Escape)
+                    {
+                        Console.Clear();
+                        ReplayWriter.CloseWriter();
+                        break;
+                    }
+                    Command update = null;
+                    try
+                    {
+                        update = Dungeon.updateCommand(game, key);
+                        if (update != null)
+                            game.update(update);
+                    }
+                    catch (Exception) { }
                     Console.Clear();
-                    Console.WriteLine("You LOST!");
-                    ReplayWriter.CloseWriter();
-                    Console.ReadKey();
-                    break;
                 }
-
-
-                Node location = game.player.location;
-                Console.WriteLine("PlayerHp: " + game.player.HP + "/" + game.player.HPbase);
-                Console.WriteLine("Current location: " + location.id);
-                Console.WriteLine("Bag contains:");
-                Console.WriteLine(game.player.bag.Count(a => a.GetType() == typeof(HealingPotion)) + " healing potions");
-                Console.WriteLine(game.player.bag.Count(a => a.GetType() == typeof(Crystal)) + " crystals");
-                Console.WriteLine("Available commands:");
-                for (int i = 0; i < location.neighbors.Count; i++)
-                    Console.WriteLine((i + 1) + ": move to " + location.neighbors[i].id);
-
-
-
-                if (game.player.bag.Exists(a => a.GetType() == typeof(HealingPotion)))
-                {
-                    Console.WriteLine("h: use healing potion");
-                }
-
-                Console.WriteLine("d: do nothing");
-                Console.WriteLine("esc: exit");
-                ConsoleKey key = Console.ReadKey().Key;
-                ReplayWriter.RecordKey(key);
-                if (key == ConsoleKey.Escape)
-                {
-                    Console.Clear();
-                    ReplayWriter.CloseWriter();
-                    break;
-                }
-                Command update = null;
-                try
-                {
-                    update = Dungeon.updateCommand(game, key);
-                    if (update != null)
-                        game.update(update);
-                }
-                catch (Exception) { }
-                Console.Clear();
             }            
         }
     }

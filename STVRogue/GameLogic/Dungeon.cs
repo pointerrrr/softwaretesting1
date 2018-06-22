@@ -60,12 +60,13 @@ namespace STVRogue.GameLogic
                 totalHealth += (int)pot.HPvalue;
             }
 
-            int crystals = random.Next(1, (int)difficultyLevel * 2);
+            int crystals = random.Next((int)difficultyLevel, (int)difficultyLevel * 2);
 
             for(int i = 0; i < crystals; i++)
             {
                 Crystal crystal = new Crystal(i.ToString());
-                allNodes[random.Next(0, allNodes.Count)].items.Add(crystal);
+                int index = random.Next(0, allNodes.Count);
+                allNodes[index].items.Add(crystal);
             }
         }
 
@@ -454,9 +455,16 @@ namespace STVRogue.GameLogic
                             return;
                         }
                         else
+                        {
+                            noMovement(player);
                             return;
+                        }
                     }
-                    else { return; }
+                    else
+                    {
+                        noMovement(player);
+                        return;
+                    }
                 case ConsoleKey.F:
                     Console.WriteLine("Choose where to flee to:");
                     for (int i = 0; i < neighbors.Count; i++)
@@ -472,11 +480,17 @@ namespace STVRogue.GameLogic
                     try
                     {
                         Console.Clear();
-                        
+
                         player.Move(neighbors[int.Parse(key.ToString()) - 1]);
                         player.game.updateMonsters();
                     }
-                    catch { Console.Clear(); Console.WriteLine("Invalid input. Try again!"); return; }
+                    catch
+                    {
+                        noMovement(player);
+                        Console.Clear();
+                        Console.WriteLine("Invalid input. Try again!");
+                        return;
+                    }
                     break;
                 case ConsoleKey.A:
                     player.Attack(packs[0].members[0]);
@@ -485,9 +499,21 @@ namespace STVRogue.GameLogic
                         monsterCombatTurn(player);
                     break;
                 default:
+                    noMovement(player);
                     Console.WriteLine("Unknown Command. Try again!");
                     return;
             }
+        }
+
+        public void noMovement(Player player)
+        {
+            Predicates pred = new Predicates();
+            List<Node> allNodes = pred.reachableNodes(player.dungeon.startNode);
+            List<Pack> allPacks = new List<Pack>();
+            foreach (Node node in allNodes)
+                allPacks.AddRange(node.packs);
+            foreach (Pack pack in allPacks)
+                pack.previousLocation = new KeyValuePair<Node, int>(pack.location, 1);
         }
 
         public bool contested(Player player)
