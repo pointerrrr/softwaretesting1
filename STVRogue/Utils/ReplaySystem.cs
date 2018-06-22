@@ -66,7 +66,7 @@ namespace STVRogue.Utils
                 nodeCapacityMultiplier = uint.Parse(values[1]);
                 numberOfMonsters = uint.Parse(values[2]);
                 commands = new List<ConsoleKey>();
-                ReplayWriter.InitializeReplaySystem("asdfsadf", seed, difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
+                ReplayWriter.InitializeReplaySystem("replayer", seed, difficultyLevel, nodeCapacityMultiplier, numberOfMonsters);
                 string[] res = reader.ReadToEnd().Split(',');
                 foreach (string key in res)
                 {
