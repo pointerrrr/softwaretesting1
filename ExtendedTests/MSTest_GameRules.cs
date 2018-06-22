@@ -21,6 +21,7 @@ namespace STVRogue.GameLogic
                 replays.Add(new ReplayReader(Environment.CurrentDirectory + "../../../../replays/" + file));
         }
 
+        // Make sure the replay system works by checking if the NOCombat_ReachEnd replay indeed reaches the end
         [TestMethod]
         public void Test_ReplaySystem()
         {
