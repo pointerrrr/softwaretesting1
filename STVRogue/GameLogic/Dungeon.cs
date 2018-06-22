@@ -278,7 +278,7 @@ namespace STVRogue.GameLogic
         public uint level(Node d)
         {
             if (utils.isBridge(startNode, exitNode, d))
-                return utils.countNumberOfBridges(startNode, d) + 1;
+                return (uint)d.zoneId;
             else
                 return 0;
         }
