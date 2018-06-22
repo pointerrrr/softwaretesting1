@@ -1,3 +1,3 @@
-6456329
+1169997558
 6,100,1000
-NumPad2,F,NumPad2,NumPad3,NumPad2,NumPad4,F,NumPad2,NumPad1,F,NumPad2,NumPad2,F,NumPad3,A,I,C,I,H,A,A,A,F,NumPad1,H,F,NumPad2,NumPad3,F,NumPad2,NumPad4,F,NumPad3,NumPad4,F,NumPad3,NumPad3,F,NumPad4,NumPad3,I,C,F,NumPad2,D,I,C,O,H,F,NumPad2,H,A,A,A,A,A,A,A,A,A,A,A,A,A,
+NumPad2,F,NumPad1,H,H,F,NumPad2,A,A,A,A,A,A,F,NumPad1,H,H,H,NumPad1,F,NumPad2,F,NumPad2,F,NumPad3,F,NumPad3,F,NumPad3,F,NumPad2,F,NumPad4,F,NumPad2,F,NumPad2,F,NumPad2,F,NumPad2,I,C,A,I,H,F,NumPad2,F,NumPad3,I,C,I,H,F,NumPad2,F,NumPad2,F,NumPad4,F,NumPad2,F,NumPad4,F,NumPad3,F,NumPad1,F,NumPad3,F,NumPad3,F,NumPad1,F,NumPad2,A,A,A,A,A,A,A,A,A,A,A,PageUp,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,A,
