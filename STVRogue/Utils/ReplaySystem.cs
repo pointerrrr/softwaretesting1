@@ -92,7 +92,15 @@ namespace STVRogue.Utils
                     if (hasNextTurn())
                         replayTurn();
                     else
+                    {
+                        if(ok.GetType() == typeof(FutureConditional))
+                        {
+                            FutureConditional fc = spec as FutureConditional;
+                            if (fc.conditionalMet && !fc.futureMet)
+                                return false;
+                        }
                         break;
+                    }
                 }
                 else // oterwise the test fails:
                 {
@@ -173,5 +181,26 @@ namespace STVRogue.Utils
         {
             return history = !history || (history && (always(gameState) || unless(gameState)));
         }            
+    }
+
+    public class FutureConditional : Specification
+    {
+        public bool conditionalMet = false;
+        public bool futureMet = false;
+        public Predicate<Game> conditional;
+        public Predicate<Game> future;
+
+        public FutureConditional(Predicate<Game> p, Predicate<Game> q)
+        {
+            conditional = p;
+            future = q;
+        }
+
+        public override bool Test(Game gameState)
+        {
+            conditionalMet |= conditional(gameState);
+            futureMet |= conditionalMet && future(gameState);
+            return true;
+        }
     }
 }

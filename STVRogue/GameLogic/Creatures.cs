@@ -39,8 +39,12 @@ namespace STVRogue.GameLogic
         public Boolean accelerated = false;
         public uint KillPoint = 0;
         public List<Item> bag = new List<Item>();
+        public List<Item> usedItems = new List<Item>();
         public Node previousLocation;
+        public List<Node> previousLocations = new List<Node>();
         public Game game;
+        
+
         public Player()
         {
             //this.dungeon = dungeon;
@@ -54,6 +58,7 @@ namespace STVRogue.GameLogic
             if (!bag.Contains(item) || item.used) throw new ArgumentException();
             item.use(this);
             bag.Remove(item);
+            usedItems.Add(item);
         }
 
         override public void Attack(Creature foe)
@@ -94,11 +99,13 @@ namespace STVRogue.GameLogic
         {
             if (location.neighbors.Contains(node))
             {
+                if(!previousLocations.Contains(location))
+                    previousLocations.Add(location);
                 location = node;
                 if (location.items.Count > 0)
                     foreach (Item item in location.items)
                         bag.Add(item);
-                location.items.Clear();
+                location.items.Clear();                
                 return true;
             }
             return false;

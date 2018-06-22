@@ -15,7 +15,9 @@ namespace STVRogue.GameLogic
         public uint M;
         public uint numberOfMonsters;
         public int totalMonsterHP = 0;
+        public int startSize = 0;
         private Predicates utils = new Predicates();
+        public List<Node> allStartNodes;
 
         /* To create a new dungeon with the specified difficult level and capacity multiplier */
         public Dungeon(uint level, uint nodeCapacityMultiplier, uint numberOfMonsters)
@@ -45,8 +47,9 @@ namespace STVRogue.GameLogic
             exitNode = exit;
             
             TestDungeon(startNode, exitNode, difficultyLevel);
+            allStartNodes = utils.reachableNodes(startNode);
+            startSize = allStartNodes.Count;
             AddItems();
-
         }
 
         public void AddItems()

@@ -78,6 +78,44 @@ namespace STVRogue.GameLogic
                 Assert.IsTrue(reader.replay(new Unless(NotInLastZone, ForcedMove)));
         }
 
+        [TestMethod]
+        public void Test_S1()
+        {
+            InitReplays();
+            foreach (ReplayReader reader in replays)
+                Assert.IsTrue(reader.replay(new FutureConditional(ShrunkDungeon, UsedCrystal)));
+        }
+
+        [TestMethod]
+        public void Test_S2()
+        {
+            InitReplays();
+            foreach (ReplayReader reader in replays)
+                Assert.IsTrue(reader.replay(new FutureConditional(ReachedExit, PassedAllBridges)));
+        }
+
+        public bool ShrunkDungeon(Game game)
+        {
+            Predicates pred = new Predicates();
+            return game.dungeon.startSize > pred.reachableNodes(game.dungeon.startNode).Count;
+        }
+
+        public bool UsedCrystal(Game game)
+        {
+            return game.player.usedItems.Where(a => a.GetType() == typeof(Crystal)).Count() > 0;
+        }
+
+        public bool ReachedExit(Game game)
+        {
+            return game.player.location == game.dungeon.exitNode;
+        }
+
+        public bool PassedAllBridges(Game game)
+        {
+            List<Node> allBridges = game.dungeon.allStartNodes.Where(a => a.GetType() == typeof(Bridge)).ToList();
+            return game.player.previousLocations.Intersect(allBridges) == allBridges;
+        }
+
         static bool RZone(Game game)
         {
             Predicates pred = new Predicates();
