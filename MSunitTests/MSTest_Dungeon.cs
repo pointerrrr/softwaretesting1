@@ -117,6 +117,9 @@ namespace STVRogue.GameLogic
             Bridge b1 = new Bridge("1");
             Node n0 = new Node("N0");
 
+            b1.zoneId = 1;
+            n0.zoneId = 1;
+
             testDungeon.startNode = start;
             testDungeon.exitNode = exit;
 
