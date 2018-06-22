@@ -58,7 +58,7 @@ namespace STVRogue.GameLogic
 
         // (G => ¬Contested(G.Player.Location))
         // unless
-        // (G => (∀x : x ∈ G.Dungeon.AllPacks : ShortestPath(x.PreviousLocation, G.Player.Location) ≤ ShortestPath(x.Location, G.Player.Location))
+        // (G => (∀x : x ∈ G.Dungeon.AllPacks : ShortestPath(x.PreviousLocation, G.Player.Location) ≤ ShortestPath(x.Location, G.Player.Location)))
         [TestMethod]
         public void Test_RAlert()
         {
@@ -69,7 +69,7 @@ namespace STVRogue.GameLogic
 
         // (G => G.Player.Location.ZoneID <> G.Dungeon.DifficultyLevel + 1)
         // unless
-        // (G => (∀x : x ∈ G.Dungeon.AllPacks ∧ (x.Location.ZoneID = G.Player.Location.ZoneID) : (ShortestPath(x.PreviousLocation, G.Player.Location).Length < ShortestPath(x.Location, G.Player.Location).Length) ∨ CannotMove(x, ShortestPath(x.PreviousLocation, x.Player.Location)[0]))
+        // (G => (∀x : x ∈ G.Dungeon.AllPacks ∧ (x.Location.ZoneID = G.Player.Location.ZoneID) : (ShortestPath(x.PreviousLocation, G.Player.Location).Length < ShortestPath(x.Location, G.Player.Location).Length) ∨ CannotMove(x, ShortestPath(x.PreviousLocation, x.Player.Location)[0])))
         [TestMethod]
         public void Test_REndZone()
         {
@@ -78,6 +78,9 @@ namespace STVRogue.GameLogic
                 Assert.IsTrue(reader.replay(new Unless(NotInLastZone, ForcedMove)));
         }
 
+        // (G => G.Dungeon.StartSize > G.Dungeon.Size)
+        // leads to
+        // (G => (∃x : x ∈ G.Player.UsedItems : x.Type = Crystal))
         [TestMethod]
         public void Test_S1()
         {
@@ -86,6 +89,10 @@ namespace STVRogue.GameLogic
                 Assert.IsTrue(reader.replay(new FutureConditional(ShrunkDungeon, UsedCrystal)));
         }
 
+
+        // (G => G.Player.Location = G.Dungeon.ExitNode)
+        // leads to
+        // (G => (∀x : x ∈ G.Dungeon.AllBridges : (∃y : y ∈ G.Player.PreviousLocations : x = y)))
         [TestMethod]
         public void Test_S2()
         {
