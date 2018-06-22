@@ -22,18 +22,59 @@ namespace STVRogue.GameLogic
         }
 
         [TestMethod]
-        public void Test_GameRules()
+        public void Test_ReplaySystem()
         {
             InitReplays();
             Assert.IsFalse(replays[1].replay(new Always(a => a.player.location != a.dungeon.exitNode)));
+        }
+
+        // Properties of entities in our logic that might not speak for itself
+        // Entity.PreviousLocation = location at start of turn
+        // Entity.Location = location at end of turn
+        // Entity.StartLocation = location at start of game
+        // Methods in our Logic system that might not speak for itself
+        // CannotMove(Entity, Node) = cannot move the Entity to the Node
+
+        // always
+        // (G => (∀x : x ∈ G.Dungeon.AllPacks : x.Location.ZoneID = x.StartLocation.ZoneID))
+        [TestMethod]
+        public void Test_RZone()
+        {
+            InitReplays();
             foreach (ReplayReader reader in replays)
-            {
-                Assert.IsTrue(reader.replay(new Always(RZone)));
+                Assert.IsTrue(reader.replay(new Always(RZone)));            
+        }
+
+        // always
+        // (G => (∀x : x ∈ G.Dungeon.AllNodes : x.MonsterCount <= x.MaxCapacity))
+        [TestMethod]
+        public void Test_RNode()
+        {
+            InitReplays();
+            foreach (ReplayReader reader in replays)
                 Assert.IsTrue(reader.replay(new Always(RNode)));
+        }
+
+        // (G => ¬Contested(G.Player.Location))
+        // unless
+        // (G => (∀x : x ∈ G.Dungeon.AllPacks : ShortestPath(x.PreviousLocation, G.Player.Location) ≤ ShortestPath(x.Location, G.Player.Location))
+        [TestMethod]
+        public void Test_RAlert()
+        {
+            InitReplays();
+            foreach (ReplayReader reader in replays)
                 Assert.IsTrue(reader.replay(new Unless(NotContested, MovedTowards)));
+        }
+
+        // (G => G.Player.Location.ZoneID <> G.Dungeon.DifficultyLevel + 1)
+        // unless
+        // (G => (∀x : x ∈ G.Dungeon.AllPacks ∧ (x.Location.ZoneID = G.Player.Location.ZoneID) : (ShortestPath(x.PreviousLocation, G.Player.Location).Length < ShortestPath(x.Location, G.Player.Location).Length) ∨ CannotMove(x, ShortestPath(x.PreviousLocation, x.Player.Location)[0]))
+        [TestMethod]
+        public void Test_REndZone()
+        {
+            InitReplays();
+            foreach (ReplayReader reader in replays)
                 Assert.IsTrue(reader.replay(new Unless(NotInLastZone, ForcedMove)));
-            }
-            
         }
 
         static bool RZone(Game game)
