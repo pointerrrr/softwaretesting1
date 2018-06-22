@@ -75,7 +75,7 @@ namespace STVRogue.GameLogic
                     {
                         if (pack.previousLocation.Key != null && pack.previousLocation.Key != pack.location && game.player.previousLocation != pack.previousLocation.Key)
                         {
-                            List<Node> path1 = game.dungeon.shortestpath(pack.previousLocation.Key, game.player.previousLocation);
+                            List<Node> path1 = game.dungeon.shortestpath(pack.previousLocation.Key, game.player.location);
                             List<Node> path2 = game.dungeon.shortestpath(pack.location, game.player.location);
                             if (path1.Count <= path2.Count)
                                 return false;
@@ -92,7 +92,7 @@ namespace STVRogue.GameLogic
             foreach (Node node in allNodes)
                 allPacks.AddRange(node.packs);
             foreach (Pack pack in allPacks)
-                if (pack.previousLocation.Key == pack.location && pack.location == game.player.location)
+                if (pack.previousLocation.Key == pack.location && pack.location == game.player.location && pack.location.contested(game.player))
                     return false;
             return true;
         }
@@ -115,7 +115,7 @@ namespace STVRogue.GameLogic
                         
                         if (pack.previousLocation.Key != pack.location && game.player.previousLocation != pack.previousLocation.Key)
                         {
-                            List<Node> path1 = game.dungeon.shortestpath(pack.previousLocation.Key, game.player.previousLocation);
+                            List<Node> path1 = game.dungeon.shortestpath(pack.previousLocation.Key, game.player.location);
                             List<Node> path2 = game.dungeon.shortestpath(pack.location, game.player.location);
                             if (path1.Count <= path2.Count)
                                 return false;
