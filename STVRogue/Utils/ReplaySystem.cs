@@ -119,19 +119,6 @@ namespace STVRogue.Utils
             }
         }
 
-        static bool NotContested(Game game)
-        {
-            Predicates pred = new Predicates();
-            List<Node> allNodes = pred.reachableNodes(game.dungeon.startNode);
-            List<Pack> allPacks = new List<Pack>();
-            foreach (Node node in allNodes)
-                allPacks.AddRange(node.packs);
-            foreach (Pack pack in allPacks)
-                if (pack.previousLocation.Key == pack.location && pack.location == game.player.location)
-                    return false;
-            return true;
-        }
-
         private void reset()
         {
             currentTurn = 0;
